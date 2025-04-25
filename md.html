@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+<style>
+  body {
+    display: grid;
+    grid-template-columns: repeat(2, 15cm);
+  }
+
+  .md {
+    width: 15cm;
+    height: 20cm;
+    border-right: 1px solid black;
+  }
+
+  .md-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1cm;
+  }
+
+  .logo {
+    max-height: 110px;
+    padding-left: 20px;
+  }
+
+  .title {
+    margin-top: -5px;
+    text-align: center;
+    line-height: 0.2;
+  }
+
+  .md-patient {
+    display: flex;
+    justify-content: start;
+    padding: 0 1cm;
+    margin-bottom: -20px;
+  }
+
+  .patient {
+    font-weight: bold;
+    border-bottom: 1px solid black;
+    width: 100%;
+    margin-left: 10px;
+  }
+
+  .md-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1cm 1cm 1cm;
+  }
+
+  .signature {
+    width: 300px;
+    border-top: 1px solid black;
+    text-align: center;
+    padding-top: 5px;
+  }
+
+  .md-body {
+    height: 11cm;
+    padding: 0 1cm;
+    line-height: 0;
+  }
+
+  .instruction {
+    font-size: 10pt;
+    margin-top: -2px;
+    margin-left: 15px;
+  }
+
+  .medicine {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .medicine-name {
+    font-weight: bold;
+  }
+
+  .use-method {
+    font-size: 16pt;
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+
+  .medicine-name, .medicine-quantity {
+    flex-shrink: 0;
+  }
+
+  .line {
+    flex-grow: 1;
+    border-bottom: 1px dashed black;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 20px;
+  }
+</style>
+<body>
+    <div class="md">
+      <div class="md-header">
+        <div>
+          <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
+        </div>
+        <div class="title">
+          <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>
+          <p>PSF 2 – SÃO FRANCISCO DE ASSIS</p>
+          <p>TELEFONE:3533-1415</p>
+          <p>CENTRO</p>
+        </div>
+      </div>
+      <div class="md-patient">
+        <p>Nome:</p>
+        <p class="patient">DAVINA DA CUNHA</p>
+      </div>
+      <div class="md-body">
+        <p class="use-method">USO ORAL:</p>
+        <div class="medicine">
+          <p class="medicine-name">1) HEMIFUMARATO DE QUETIAPINA 25 MG</p>
+          <p class="line"></p>
+          <p class="medicine-quantity">2 CAIXAS</p>
+        </div>
+        <p class="instruction">TOMAR DOIS COMPRIMIDOS POR DIA À NOITE</p>
+        <p class="use-method">USO ORAL:</p>
+        <div class="medicine">
+          <p class="medicine-name">2) OXALATO DE ESCITALOPRAM 10 MG</p>
+          <p class="line"></p>
+          <p class="medicine-quantity">1 CAIXA</p>
+        </div>
+        <p class="instruction">TOMAR UM COMPRIMIDO PELA MANHÃ</p>
+      </div>
+      <div class="md-footer">
+        <p>25/04/2025</p>
+        <p class="signature">ASSINATURA DO MÉDICO - CRM</p>
+    </div>
+  </div>
+  <div class="md">
+    <div class="md-header">
+      <div>
+        <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
+      </div>
+      <div class="title">
+        <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>
+        <p>PSF 2 – SÃO FRANCISCO DE ASSIS</p>
+        <p>TELEFONE:3533-1415</p>
+        <p>CENTRO</p>
+      </div>
+    </div>
+    <div class="md-patient">
+      <p>Nome:</p>
+      <p class="patient">DAVINA DA CUNHA</p>
+    </div>
+    <div class="md-body">
+      <p class="use-method">USO ORAL:</p>
+      <div class="medicine">
+        <p class="medicine-name">1) HEMIFUMARATO DE QUETIAPINA 25 MG</p>
+        <p class="line"></p>
+        <p class="medicine-quantity">2 CAIXAS</p>
+      </div>
+      <p class="instruction">TOMAR DOIS COMPRIMIDOS POR DIA À NOITE</p>
+      <p class="use-method">USO ORAL:</p>
+      <div class="medicine">
+        <p class="medicine-name">2) OXALATO DE ESCITALOPRAM 10 MG</p>
+        <p class="line"></p>
+        <p class="medicine-quantity">1 CAIXA</p>
+      </div>
+      <p class="instruction">TOMAR UM COMPRIMIDO PELA MANHÃ</p>
+    </div>
+    <div class="md-footer">
+      <p>25/04/2025</p>
+      <p class="signature">ASSINATURA DO MÉDICO - CRM</p>
+  </div>
+</div>
+</body>
+</html>

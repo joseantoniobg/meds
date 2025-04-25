@@ -1,0 +1,15 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { PageFilterDto } from "../../shared/dto/page.filter.dto";
+import { IsOptional, IsUUID } from "class-validator";
+
+export class MedicalPrescriptionFiltersDto extends PageFilterDto {
+  @ApiProperty({ description: 'ID do paciente' })
+  @IsOptional()
+  @IsUUID('4', { message: 'O id do paciente deve ser um UUID' })
+  patientId: string;
+
+  @ApiProperty({ description: 'ID do medicamento' })
+  @IsOptional()
+  @IsUUID('4', { message: 'O id do medicamento deve ser um UUID' })
+  medicineId: string;
+}
