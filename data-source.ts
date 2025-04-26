@@ -15,7 +15,9 @@ const AppDataSource = new DataSource({
   synchronize: false,
   migrationsRun: false,
   logging: true,
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false,
+  }
 });
 
 export default AppDataSource;

@@ -23,7 +23,9 @@ export class DatabasePostgresConfig implements TypeOrmOptionsFactory {
         allowExitOnIdle: true,
         connectionTimeoutMillis: 60000,
       },
-      ssl: true,
+      ssl: {
+        rejectUnauthorized: false,
+      }
     };
   }
 }
