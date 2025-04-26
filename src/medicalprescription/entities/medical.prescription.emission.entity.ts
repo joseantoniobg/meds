@@ -1,7 +1,6 @@
-import PatientEntity from "../../patient/entities/patient.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { MedicalPrescriptionMedicineEntity } from "./medical.prescription.medicine.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { MedicalPrescriptionEntity } from "./medical.prescription.entity";
+import { MedicalPrescriptionEmissionBatchEntity } from "./medical.prescription.emission.batch.entity";
 
 @Entity('medical_prescription_emission')
 export class MedicalPrescriptionEmissionEntity {
@@ -11,8 +10,9 @@ export class MedicalPrescriptionEmissionEntity {
   @Column({ name: 'id_batch', type: 'uuid' })
   batchId: string;
 
-  @Column({ name: 'is_daily_emission', type: 'bool', default: false })
-  isDailyEmission: boolean;
+  @ManyToOne(() => MedicalPrescriptionEmissionBatchEntity, (mp) => mp.id, { nullable: false })
+  @JoinColumn({ name: 'id_batch', referencedColumnName: 'id' })
+  medicalPrescriptionBatch: MedicalPrescriptionEmissionBatchEntity;
 
   @Column({ name: 'id_medical_prescription', type: 'uuid' })
   medicalPrescriptionId: string;
@@ -21,12 +21,6 @@ export class MedicalPrescriptionEmissionEntity {
   @JoinColumn({ name: 'id_medical_prescription', referencedColumnName: 'id' })
   medicalPrescription: MedicalPrescriptionEntity;
 
-  @Column({ type: 'date', name: 'initial_date' })
-  date: Date;
-
   @Column({ type: 'varchar', length: 2500 })
   html: string;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt: Date;
 }

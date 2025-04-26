@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Res } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MedicalPrescriptionService } from './medical.prescription.service';
 import { PageResponseDto } from '../shared/dto/page.response.dto';
 import { AccessTokenGuard } from '../shared/guards/access.token.guard';
 import MedicalPrescriptionDto from './dto/medical.prescription.dto';
 import { MedicalPrescriptionFiltersDto } from './dto/medical.prescription.filters.dto';
+import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
+import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
+import { Response } from 'express';
 
 @ApiTags('Medical Prescriptions')
 @Controller('medicalPrescriptions')
@@ -30,5 +33,25 @@ export class MedicalPrescriptionController {
   })
   listPrescriptions(@Query() filters: MedicalPrescriptionFiltersDto) {
     return this.medicalPrescriptionService.findMedicalPrescriptions(filters);
+  }
+
+  @Get('emission')
+  @ApiResponse({
+    status: 200,
+    description: 'Emite as receitas desejadas',
+    type: PageResponseDto<MedicalPrescriptionEmissionDto>
+  })
+  emitPrescriptions(@Query() filters: EmitMedicalPrescriptionFiltersDto) {
+    return this.medicalPrescriptionService.emitMedicalPrescriptions(filters);
+  }
+
+  @Get('print')
+  @ApiResponse({
+    status: 200,
+    description: 'Imprime as receitas desejadas',
+    type: PageResponseDto<MedicalPrescriptionEmissionDto>
+  })
+  async printPrescriptions(@Query() filters: EmitMedicalPrescriptionFiltersDto, @Res() res: Response) {
+    return this.medicalPrescriptionService.printMedicalPrescriptions(filters, res);
   }
 }
