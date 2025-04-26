@@ -127,7 +127,7 @@ export class MedicalPrescriptionService {
 						          <p class="medicine-quantity">', t.quantity, '</p>
 						        </div>
 						        <p class="instruction">', t.instruction_of_use, '.</p>
-                               '), ''),
+                               '), '' ORDER BY t.use_method, t.row_med ASC),
              '</div>
              <div class="md-footer">
 			        <p>', TO_CHAR(CURRENT_DATE, 'DD/MM/YYYY'), '</p>
@@ -165,7 +165,7 @@ export class MedicalPrescriptionService {
 
     sql += `) t
       group by t.name, t.id
-      order by t.id
+      order by t.name, t.id
       offset ${(emissionFilters.page - 1) * emissionFilters.size} limit ${emissionFilters.size}`;
 
     const medicalPrescriptions = await queryRunner.query(sql, filters);
@@ -189,18 +189,18 @@ export class MedicalPrescriptionService {
   async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response) {
     const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters);
 
-    // const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
-    //   isDailyEmission: emissionFilters.dailyEmission,
-    //   date: new Date(),
-    // });
+    const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
+      isDailyEmission: emissionFilters.dailyEmission,
+      date: new Date(),
+    });
 
-    // const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
-    //   batchId: batch.id,
-    //   medicalPrescriptionId: mp.id,
-    //   isDailyEmission: emissionFilters.dailyEmission,
-    //   date: new Date(),
-    //   html: mp.html,
-    // })));
+    const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
+      batchId: batch.id,
+      medicalPrescriptionId: mp.id,
+      isDailyEmission: emissionFilters.dailyEmission,
+      date: new Date(),
+      html: mp.html,
+    })));
 
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">
