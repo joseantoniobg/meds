@@ -206,6 +206,22 @@ export class MedicalPrescriptionService {
     }
   }
 
+  async cancelMedicalPrescription(id: string) {
+    if (!isUUID(id, '4')) {
+      throw new HttpException('Id de receita médica deve ser um uuid', 400);
+    }
+
+    const medicalPrescription = await this.medicalPrescriptionRepository.findOne({ where: { id } });
+    if (!medicalPrescription) {
+      throw new HttpException('Receita médica não encontrada', 404);
+    }
+    if (medicalPrescription.status === 0) {
+      throw new HttpException('Receita médica já cancelada', 400);
+    }
+    medicalPrescription.status = 0;
+    await this.medicalPrescriptionRepository.save(medicalPrescription);
+  }
+
   async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response) {
     const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters);
 

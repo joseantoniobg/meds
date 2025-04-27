@@ -41,9 +41,6 @@ export class MedicalPrescriptionEntity {
   @Column({ type: 'smallint', default: 1 })
   status: number;
 
-  @Column({ type: 'date', nullable: true })
-  date: Date;
-
   @OneToMany(
     () => MedicalPrescriptionMedicineEntity,
     (mpm) => mpm.medicalPrescription,

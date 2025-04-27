@@ -43,6 +43,20 @@ export class MedicalPrescriptionController {
     return this.medicalPrescriptionService.create(createMedicalPrescriptionDto, token);
   }
 
+  @Patch('cancel')
+  @ApiResponse({
+    status: 200,
+    description: 'Cancela a prescrição médica',
+    type: MedicalPrescriptionDto,
+  })
+  cancelPrescription(
+    @Body('id') medicalPrescriptionId: string,
+  ) {
+    return this.medicalPrescriptionService.cancelMedicalPrescription(
+      medicalPrescriptionId,
+    );
+  }
+
   @Get()
   @ApiResponse({
     status: 200,
