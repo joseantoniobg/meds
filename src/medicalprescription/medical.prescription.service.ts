@@ -14,6 +14,7 @@ import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.
 import { Response } from 'express';
 import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
 import { UserService } from '../user/user.service';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class MedicalPrescriptionService {
@@ -63,7 +64,7 @@ export class MedicalPrescriptionService {
           page: medicalPrescriptionFilters.page,
           size: medicalPrescriptionFilters.size,
           patientId: null,
-          medicalPrescriptionId: null,
+          medicalPrescriptionIds: null,
           date: medicalPrescriptionFilters.date ?? new Date(),
         });
     }
@@ -106,6 +107,10 @@ export class MedicalPrescriptionService {
   }
 
   async emitMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto): Promise<PageResponseDto<MedicalPrescriptionEmissionDto>> {
+    if (emissionFilters.medicalPrescriptionIds && emissionFilters.medicalPrescriptionIds.filter((id) => !isUUID(id, '4')).length > 0) {
+      throw new HttpException('Id de receita médica deve ser um uuid', 400);
+    }
+
     const filters = Array();
 
     filters.push(emissionFilters.date);
@@ -165,9 +170,8 @@ export class MedicalPrescriptionService {
       LEFT JOIN medical_prescription_emission mpe on mpe.id_medical_prescription = mp.id
       WHERE 1 = 1`;
 
-    if (emissionFilters.medicalPrescriptionId) {
-      sql += ` and mp.id = $${filters.length + 1}`;
-      filters.push(emissionFilters.medicalPrescriptionId);
+    if (emissionFilters.medicalPrescriptionIds) {
+      sql += ` and mp.id IN (${emissionFilters.medicalPrescriptionIds.map((id) => `'${id}'`).join(',')})`;
     }
 
     if (emissionFilters.patientId) {
@@ -176,7 +180,7 @@ export class MedicalPrescriptionService {
     }
 
     if (emissionFilters.dailyEmission) {
-      sql += ` and next_working_day((coalesce(mpe.date, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE`;
+      sql += ` and next_working_day((coalesce(mpe.date, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and md.status = 1`;
     }
 
     sql += `) t

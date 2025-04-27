@@ -1,13 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsUUID } from "class-validator";
+import { IsArray, IsOptional, IsUUID } from "class-validator";
 import { PageFilterDto } from "../../shared/dto/page.filter.dto";
 import { Transform } from "class-transformer";
 
 export default class EmitMedicalPrescriptionFiltersDto extends PageFilterDto {
-  @ApiProperty({ description: 'Id da receita médica' })
-  @IsUUID('4', { message: 'Id da Receita deve ser um UUID' })
+  @ApiProperty({ description: 'Ids da receita médicas' })
+  @Transform(({ value }) => value.split(','))
+  @IsArray({ message: 'Ids da Receitas deve ser um array' })
   @IsOptional()
-  medicalPrescriptionId: string;
+  medicalPrescriptionIds: string[];
 
   @ApiProperty({ description: 'Data da receita médica' })
   date: Date;

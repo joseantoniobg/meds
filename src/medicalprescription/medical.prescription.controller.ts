@@ -60,6 +60,8 @@ export class MedicalPrescriptionController {
     type: PageResponseDto<MedicalPrescriptionEmissionDto>,
   })
   emitPrescriptions(@Query() filters: EmitMedicalPrescriptionFiltersDto) {
+    console.log(filters);
+    return;
     return this.medicalPrescriptionService.emitMedicalPrescriptions(filters);
   }
 
