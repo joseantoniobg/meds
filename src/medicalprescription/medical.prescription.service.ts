@@ -12,19 +12,29 @@ import { MedicalPrescriptionEmissionBatchEntity } from './entities/medical.presc
 import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
 import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
 import { Response } from 'express';
+import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class MedicalPrescriptionService {
   constructor(@InjectRepository(MedicalPrescriptionEntity) private readonly medicalPrescriptionRepository: Repository<MedicalPrescriptionEntity>,
               @InjectRepository(MedicalPrescriptionMedicineEntity) private readonly medicalPrescriptionMedicineRepository: Repository<MedicalPrescriptionMedicineEntity>,
               @InjectRepository(MedicalPrescriptionEmissionEntity) private readonly medicalPrescriptionEmissionRepository: Repository<MedicalPrescriptionEmissionEntity>,
-              @InjectRepository(MedicalPrescriptionEmissionBatchEntity) private readonly medicalPrescriptionEmissionBatchRepository: Repository<MedicalPrescriptionEmissionBatchEntity>) {}
+              @InjectRepository(MedicalPrescriptionEmissionBatchEntity) private readonly medicalPrescriptionEmissionBatchRepository: Repository<MedicalPrescriptionEmissionBatchEntity>,
+              private readonly userService: UserService) {}
 
-  async create(medicalPrescriptionDto: MedicalPrescriptionDto): Promise<MedicalPrescriptionEntity> {
+  async create(medicalPrescriptionDto: MedicalPrescriptionDto, token: TokenPayloadDto): Promise<MedicalPrescriptionEntity> {
+    const user = await this.userService.getById(token.id);
+
+    if (!user) {
+      throw new HttpException('Usuário não encontrado', 400);
+    }
+
    const medicalPrescription = this.medicalPrescriptionRepository.create({
       patientId: medicalPrescriptionDto.patientId,
       initialDate: medicalPrescriptionDto.initialDate,
-      renewal: medicalPrescriptionDto.renewal
+      renewal: medicalPrescriptionDto.renewal,
+      userId: user.id,
    });
 
    const medicalPrescriptionSaved = await this.medicalPrescriptionRepository.save(medicalPrescription);
@@ -53,7 +63,8 @@ export class MedicalPrescriptionService {
           page: medicalPrescriptionFilters.page,
           size: medicalPrescriptionFilters.size,
           patientId: null,
-          medicalPrescriptionId: null
+          medicalPrescriptionId: null,
+          date: medicalPrescriptionFilters.date ?? new Date(),
         });
     }
 
@@ -97,6 +108,8 @@ export class MedicalPrescriptionService {
   async emitMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto): Promise<PageResponseDto<MedicalPrescriptionEmissionDto>> {
     const filters = Array();
 
+    filters.push(emissionFilters.date);
+
     const queryRunner = this.medicalPrescriptionEmissionRepository.manager.connection.createQueryRunner();
 
     let sql = `SELECT COUNT(1) OVER () as total,
@@ -130,8 +143,8 @@ export class MedicalPrescriptionService {
                                '), '' ORDER BY t.use_method, t.row_med ASC),
              '</div>
              <div class="md-footer">
-			        <p>', TO_CHAR(CURRENT_DATE, 'DD/MM/YYYY'), '</p>
-			        <p class="signature">ASSINATURA DO MÉDICO - CRM</p>
+			        <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
+			        <p class="signature"> DR. ', t.username, '<br>', t.crm, '</p>
 			    </div>
 			  </div>'), E'[\\n\\r\\t]+', '', 'g') as html
 	  from (select
@@ -141,11 +154,14 @@ export class MedicalPrescriptionService {
 	        COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name) as row_med,
 	        CONCAT(COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name), ') ', m.name) as med_name,
 	        mpm.quantity,
-	        mpm.instruction_of_use
+	        mpm.instruction_of_use,
+          u.name AS username,
+          u.crm
       FROM medical_prescription mp
       JOIN medical_prescription_medicine mpm ON mp.id = mpm.id_medical_prescription
       JOIN patient p ON mp.id_patient = p.id
       JOIN medicine m ON m.id = mpm.id_medicine
+      JOIN "user" u ON mp.id_user = u.id
       LEFT JOIN medical_prescription_emission mpe on mpe.id_medical_prescription = mp.id
       WHERE 1 = 1`;
 
@@ -164,7 +180,7 @@ export class MedicalPrescriptionService {
     }
 
     sql += `) t
-      group by t.name, t.id
+      group by t.name, t.id, t.username, t.crm
       order by t.name, t.id
       offset ${(emissionFilters.page - 1) * emissionFilters.size} limit ${emissionFilters.size}`;
 

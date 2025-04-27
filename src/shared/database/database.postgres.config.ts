@@ -28,8 +28,6 @@ export class DatabasePostgresConfig implements TypeOrmOptionsFactory {
       ssl: {
         rejectUnauthorized: false,
       },
-      synchronize: true,
-      logging: true,
     };
   }
 }

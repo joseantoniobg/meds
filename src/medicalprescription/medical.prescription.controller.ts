@@ -19,7 +19,8 @@ import { MedicalPrescriptionFiltersDto } from './dto/medical.prescription.filter
 import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
 import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
 import { Response, Request } from 'express';
-import { Token } from '../shared/decorators/token.decorator';
+import { TokenPayload } from '../shared/decorators/token.decorator';
+import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
 
 @ApiTags('Medical Prescriptions')
 @Controller('medicalPrescriptions')
@@ -37,9 +38,9 @@ export class MedicalPrescriptionController {
   })
   create(
     @Body() createMedicalPrescriptionDto: MedicalPrescriptionDto,
-    @Token() token: string,
+    @TokenPayload() token: TokenPayloadDto,
   ) {
-    return this.medicalPrescriptionService.create(createMedicalPrescriptionDto);
+    return this.medicalPrescriptionService.create(createMedicalPrescriptionDto, token);
   }
 
   @Get()

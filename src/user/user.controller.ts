@@ -51,8 +51,8 @@ export class UserController {
     description: 'Busca o usuário pelo id',
   })
   @UseGuards(AccessTokenGuard)
-  async getById(@Param('id') id: string, @Req() request) {
-    return this.userService.getById(id, request.user.user);
+  async getById(@Param('id') id: string) {
+    return this.userService.getById(id);
   }
 
   @Get('/me')

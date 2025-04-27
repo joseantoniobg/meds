@@ -9,6 +9,10 @@ export class MedicalPrescriptionFiltersDto extends PageFilterDto {
   @IsUUID('4', { message: 'O id do paciente deve ser um UUID' })
   patientId: string;
 
+  @ApiProperty({ description: 'Data da receita médica' })
+  @IsOptional()
+  date: Date;
+
   @ApiProperty({ description: 'ID do medicamento' })
   @IsOptional()
   @IsUUID('4', { message: 'O id do medicamento deve ser um UUID' })

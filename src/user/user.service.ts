@@ -82,7 +82,7 @@ export class UserService {
     return null;
   }
 
-  async getById(id: string, user: User): Promise<User> {
+  async getById(id: string): Promise<User> {
     const existingUser = await this.usersRepository
       .createQueryBuilder('user')
       .where('user.id = :id', { id })
