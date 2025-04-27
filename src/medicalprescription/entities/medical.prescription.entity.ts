@@ -1,6 +1,17 @@
-import PatientEntity from "../../patient/entities/patient.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { MedicalPrescriptionMedicineEntity } from "./medical.prescription.medicine.entity";
+import PatientEntity from '../../patient/entities/patient.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { MedicalPrescriptionMedicineEntity } from './medical.prescription.medicine.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity('medical_prescription')
 export class MedicalPrescriptionEntity {
@@ -14,6 +25,13 @@ export class MedicalPrescriptionEntity {
   @JoinColumn({ name: 'id_patient', referencedColumnName: 'id' })
   patient: PatientEntity;
 
+  @Column({ name: 'id_user', type: 'uuid' })
+  userId: string;
+
+  @ManyToOne(() => User, (user) => user.id, { nullable: false })
+  @JoinColumn({ name: 'id_user', referencedColumnName: 'id' })
+  user: User;
+
   @Column({ type: 'date', name: 'initial_date' })
   initialDate: Date;
 
@@ -23,7 +41,10 @@ export class MedicalPrescriptionEntity {
   @Column({ type: 'smallint', default: 1 })
   status: number;
 
-  @OneToMany(() => MedicalPrescriptionMedicineEntity, (mpm) => mpm.medicalPrescription)
+  @OneToMany(
+    () => MedicalPrescriptionMedicineEntity,
+    (mpm) => mpm.medicalPrescription,
+  )
   medicines: MedicalPrescriptionMedicineEntity[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })

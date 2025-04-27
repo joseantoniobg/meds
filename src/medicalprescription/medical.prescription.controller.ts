@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  Res,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MedicalPrescriptionService } from './medical.prescription.service';
 import { PageResponseDto } from '../shared/dto/page.response.dto';
@@ -7,21 +18,27 @@ import MedicalPrescriptionDto from './dto/medical.prescription.dto';
 import { MedicalPrescriptionFiltersDto } from './dto/medical.prescription.filters.dto';
 import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
 import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { Token } from '../shared/decorators/token.decorator';
 
 @ApiTags('Medical Prescriptions')
 @Controller('medicalPrescriptions')
 @UseGuards(AccessTokenGuard)
 export class MedicalPrescriptionController {
-  constructor(private readonly medicalPrescriptionService: MedicalPrescriptionService) {}
+  constructor(
+    private readonly medicalPrescriptionService: MedicalPrescriptionService,
+  ) {}
 
   @Post()
   @ApiResponse({
     status: 201,
     description: 'Realiza o cadastro de um nova prescrição médica',
-    type: MedicalPrescriptionDto
+    type: MedicalPrescriptionDto,
   })
-  create(@Body() createMedicalPrescriptionDto: MedicalPrescriptionDto) {
+  create(
+    @Body() createMedicalPrescriptionDto: MedicalPrescriptionDto,
+    @Token() token: string,
+  ) {
     return this.medicalPrescriptionService.create(createMedicalPrescriptionDto);
   }
 
@@ -29,7 +46,7 @@ export class MedicalPrescriptionController {
   @ApiResponse({
     status: 200,
     description: 'Retorna a lista de prescrições médicas pesquisadas',
-    type: PageResponseDto<MedicalPrescriptionDto>
+    type: PageResponseDto<MedicalPrescriptionDto>,
   })
   listPrescriptions(@Query() filters: MedicalPrescriptionFiltersDto) {
     return this.medicalPrescriptionService.findMedicalPrescriptions(filters);
@@ -39,7 +56,7 @@ export class MedicalPrescriptionController {
   @ApiResponse({
     status: 200,
     description: 'Emite as receitas desejadas',
-    type: PageResponseDto<MedicalPrescriptionEmissionDto>
+    type: PageResponseDto<MedicalPrescriptionEmissionDto>,
   })
   emitPrescriptions(@Query() filters: EmitMedicalPrescriptionFiltersDto) {
     return this.medicalPrescriptionService.emitMedicalPrescriptions(filters);
@@ -49,9 +66,15 @@ export class MedicalPrescriptionController {
   @ApiResponse({
     status: 200,
     description: 'Imprime as receitas desejadas',
-    type: PageResponseDto<MedicalPrescriptionEmissionDto>
+    type: PageResponseDto<MedicalPrescriptionEmissionDto>,
   })
-  async printPrescriptions(@Query() filters: EmitMedicalPrescriptionFiltersDto, @Res() res: Response) {
-    return this.medicalPrescriptionService.printMedicalPrescriptions(filters, res);
+  async printPrescriptions(
+    @Query() filters: EmitMedicalPrescriptionFiltersDto,
+    @Res() res: Response,
+  ) {
+    return this.medicalPrescriptionService.printMedicalPrescriptions(
+      filters,
+      res,
+    );
   }
 }

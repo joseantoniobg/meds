@@ -20,6 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "npx ts-node -r tsconfig-paths/register node_modules/.bin/typeorm migration:generate -d data-source.ts",
+    "migration:create": "npx ts-node -r tsconfig-paths/register node_modules/.bin/typeorm migration:create",
     "migration:run": "npx ts-node -r tsconfig-paths/register node_modules/.bin/typeorm migration:run -d data-source.ts"
   },
   "dependencies": {
@@ -87,6 +88,6 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": ">=20.0.0 <24.0.0"
   }
 }

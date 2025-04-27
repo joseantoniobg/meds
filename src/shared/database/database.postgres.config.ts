@@ -16,7 +16,9 @@ export class DatabasePostgresConfig implements TypeOrmOptionsFactory {
       password: this.configService.get<string>('TYPEORM_PASSWORD'),
       database: this.configService.get<string>('TYPEORM_DATABASE'),
       entities: [this.configService.get<string>('TYPEORM_ENTITIES')],
-      migrations: [__dirname + this.configService.get<string>('TYPEORM_MIGRATIONS')],
+      migrations: [
+        __dirname + this.configService.get<string>('TYPEORM_MIGRATIONS'),
+      ],
       extra: {
         options: '-c TimeZone=America/Sao_Paulo',
         max: 100,
@@ -25,7 +27,9 @@ export class DatabasePostgresConfig implements TypeOrmOptionsFactory {
       },
       ssl: {
         rejectUnauthorized: false,
-      }
+      },
+      synchronize: true,
+      logging: true,
     };
   }
 }

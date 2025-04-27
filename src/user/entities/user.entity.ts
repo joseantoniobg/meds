@@ -36,6 +36,9 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  crm: string;
+
   @ApiProperty({
     description: 'Status (1 - ativo, 0 - inativo)',
     example: 1,
