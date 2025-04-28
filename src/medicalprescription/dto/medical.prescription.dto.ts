@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString, IsUUID, MaxLength } from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
 export class Medicines {
   @IsUUID('4', { message: 'O id do medicamento deve ser um UUID' })
@@ -14,6 +14,10 @@ export class Medicines {
 }
 
 export default class MedicalPrescriptionDto {
+  @IsUUID('4', { message: 'O id da receita médica deve ser um UUID' })
+  @IsOptional()
+  id: string;
+
   @IsUUID('4', { message: 'O id do paciente deve ser um UUID' })
   patientId: string;
 

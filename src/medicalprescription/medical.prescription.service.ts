@@ -44,7 +44,7 @@ export class MedicalPrescriptionService {
         idMedicalPrescription: medicalPrescriptionSaved.id,
         idMedicine: medicine.id,
         instructionOfUse: formatString(medicine.instructionOfUse),
-        quantity: medicine.quantity.toUpperCase()
+        quantity: formatString(medicine.quantity),
       }
    }
    );
@@ -53,6 +53,13 @@ export class MedicalPrescriptionService {
    medicalPrescriptionSaved.medicines = medicines as any;
 
    return medicalPrescriptionSaved;
+  }
+
+  async update(medicalPrescriptionDto: MedicalPrescriptionDto) {
+   return await this.medicalPrescriptionRepository.update(medicalPrescriptionDto.id, {
+      initialDate: medicalPrescriptionDto.initialDate,
+      renewal: medicalPrescriptionDto.renewal,
+   });
   }
 
   async findMedicalPrescriptions(medicalPrescriptionFilters: MedicalPrescriptionFiltersDto): Promise<PageResponseDto<MedicalPrescriptionEntity>> {
@@ -119,7 +126,7 @@ export class MedicalPrescriptionService {
 
     let sql = `SELECT COUNT(1) OVER () as total,
          t.id,
-         REGEXP_REPLACE(CONCAT('<div class="md">
+         CONCAT('<div class="md">
 	              <div class="md-header">
 	                <div>
 	                  <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
@@ -140,7 +147,8 @@ export class MedicalPrescriptionService {
          			STRING_AGG(CONCAT(case when t.row_med = 1 then CONCAT('<p class="use-method">', t.use_method, ':</p>
                    ') else '' end,
 						        '<div class="medicine">
-						          <p class="medicine-name">', t.med_name, '</p>
+                      <p class="medicine-row">', t.row_med, ')</p>
+						          <p class="medicine-name">', REPLACE(t.med_name, E'\n', '<br>'), '</p>
 						          <p class="line"></p>
 						          <p class="medicine-quantity">', t.quantity, '</p>
 						        </div>
@@ -151,13 +159,13 @@ export class MedicalPrescriptionService {
 			        <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
 			        <p class="signature"> DR. ', t.username, '<br>', t.crm, '</p>
 			    </div>
-			  </div>'), E'[\\n\\r\\t]+', '', 'g') as html
+			  </div>') as html
 	  from (select
 	        mp.id,
 	        p.name,
 	        m.use_method,
 	        COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name) as row_med,
-	        CONCAT(COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name), ') ', m.name) as med_name,
+	        m.name as med_name,
 	        mpm.quantity,
 	        mpm.instruction_of_use,
           u.name AS username,
@@ -225,18 +233,18 @@ export class MedicalPrescriptionService {
   async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response) {
     const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters);
 
-    const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
-      isDailyEmission: emissionFilters.dailyEmission,
-      date: new Date(),
-    });
+    // const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
+    //   isDailyEmission: emissionFilters.dailyEmission,
+    //   date: new Date(),
+    // });
 
-    const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
-      batchId: batch.id,
-      medicalPrescriptionId: mp.id,
-      isDailyEmission: emissionFilters.dailyEmission,
-      date: new Date(),
-      html: mp.html,
-    })));
+    // const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
+    //   batchId: batch.id,
+    //   medicalPrescriptionId: mp.id,
+    //   isDailyEmission: emissionFilters.dailyEmission,
+    //   date: new Date(),
+    //   html: mp.html,
+    // })));
 
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">
@@ -304,13 +312,13 @@ export class MedicalPrescriptionService {
               .md-body {
                 height: 11cm;
                 padding: 0 1cm;
-                line-height: 0;
               }
 
               .instruction {
                 font-size: 10pt;
-                margin-top: -2px;
+                margin-top: -10px;
                 margin-left: 15px;
+                margin-bottom: 0px;
               }
 
               .medicine {
@@ -318,8 +326,14 @@ export class MedicalPrescriptionService {
                 justify-content: space-between;
               }
 
+              .medicine-row {
+                font-weight: bold;
+                margin-right: 5px;
+              }
+
               .medicine-name {
                 font-weight: bold;
+                max-width: 8cm;
               }
 
               .use-method {
@@ -334,10 +348,10 @@ export class MedicalPrescriptionService {
 
               .line {
                 flex-grow: 1;
-                border-bottom: 1px dashed black;
+                border-top: 1px dashed black;
                 margin-left: 5px;
                 margin-right: 5px;
-                margin-top: 20px;
+                margin-top: 28px;
               }
             </style>
             <body>

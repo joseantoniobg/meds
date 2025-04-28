@@ -6,7 +6,7 @@ export default class MedicineEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 400 })
   name: string;
 
   @Column({ type: 'varchar', length: 50, name: 'use_method' })
