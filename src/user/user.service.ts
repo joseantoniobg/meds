@@ -12,8 +12,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    private readonly configService: ConfigService,
-    private connection: Connection
   ) {}
   async add(user: UserDto): Promise<{ id: string }> {
     const existingUser = await this.usersRepository.findOne({
