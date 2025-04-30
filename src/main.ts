@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Tedd Challenge - Backend')
+    .setTitle('Meds - Backend')
     .setDescription('API Documentation')
     .setVersion('1.0')
     .build();

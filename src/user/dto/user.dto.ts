@@ -17,6 +17,14 @@ export class UserDto {
   name: string;
 
   @ApiProperty({
+    description: "CRM",
+    example: "CRM-MG 00.000",
+  })
+  @IsString({ message: "O CRM deve ser uma string" })
+  @MaxLength(50, { message: "O CRM deve ter no máximo 50 caracteres" })
+  crm: string;
+
+  @ApiProperty({
     description: "User login",
     example: "johndoe",
   })
