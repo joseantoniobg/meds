@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { MedicalPrescriptionEntity } from "../../medicalprescription/entities/medical.prescription.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('patient')
 export default class PatientEntity {
@@ -7,6 +8,9 @@ export default class PatientEntity {
 
   @Column({ type: 'varchar', length: 50 })
   name: string;
+
+  @OneToMany(() => MedicalPrescriptionEntity, (mp) => mp.patient)
+  prescriptions: MedicalPrescriptionEntity[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

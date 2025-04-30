@@ -120,7 +120,7 @@ export class MedicalPrescriptionService {
 
     const filters = Array();
 
-    filters.push(emissionFilters.date);
+    filters.push(emissionFilters.date ?? new Date());
 
     const queryRunner = this.medicalPrescriptionEmissionRepository.manager.connection.createQueryRunner();
 
