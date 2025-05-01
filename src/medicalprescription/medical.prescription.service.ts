@@ -175,7 +175,6 @@ export class MedicalPrescriptionService {
       JOIN patient p ON mp.id_patient = p.id
       JOIN medicine m ON m.id = mpm.id_medicine
       JOIN "user" u ON mp.id_user = u.id
-      LEFT JOIN medical_prescription_emission mpe on mpe.id_medical_prescription = mp.id
       WHERE 1 = 1`;
 
     if (emissionFilters.medicalPrescriptionIds) {
@@ -183,12 +182,12 @@ export class MedicalPrescriptionService {
     }
 
     if (emissionFilters.patientId) {
-      sql += ` and p.id = $${filters.length + 1}`;
+      sql += ` and p.id = $${filters.length + 1} AND mp.status = 1`;
       filters.push(emissionFilters.patientId);
     }
 
     if (emissionFilters.dailyEmission) {
-      sql += ` and next_working_day((coalesce(mpe.date, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and md.status = 1`;
+      sql += ` and next_working_day((coalesce(mp.last_printed, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and md.status = 1 AND mp.renewal > 0 AND mp.status = 1`;
     }
 
     sql += `) t
@@ -223,10 +222,10 @@ export class MedicalPrescriptionService {
     if (!medicalPrescription) {
       throw new HttpException('Receita médica não encontrada', 404);
     }
-    if (medicalPrescription.status === 0) {
+    if (medicalPrescription.statusId === 0) {
       throw new HttpException('Receita médica já cancelada', 400);
     }
-    medicalPrescription.status = 0;
+    medicalPrescription.statusId = 0;
     await this.medicalPrescriptionRepository.save(medicalPrescription);
   }
 
@@ -261,7 +260,7 @@ export class MedicalPrescriptionService {
 
               .md {
                 width: 15cm;
-                height: 20cm;
+                min-height: 21cm;
                 border-right: 1px solid black;
               }
 
@@ -269,24 +268,27 @@ export class MedicalPrescriptionService {
                 display: flex;
                 justify-content: space-between;
                 padding: 1cm;
+                margin-bottom: -30px;
+                margin-top: -10px;
               }
 
               .logo {
-                max-height: 110px;
+                max-height: 90px;
                 padding-left: 20px;
               }
 
               .title {
-                margin-top: -5px;
+                margin-top: -10px;
                 text-align: center;
                 line-height: 0.2;
+                padding: 0 10px;
               }
 
               .md-patient {
                 display: flex;
                 justify-content: start;
                 padding: 0 1cm;
-                margin-bottom: -20px;
+                margin-bottom: -5px;
               }
 
               .patient {
@@ -310,15 +312,16 @@ export class MedicalPrescriptionService {
               }
 
               .md-body {
-                height: 11cm;
+                min-height: 12cm;
                 padding: 0 1cm;
+                margin-bottom: 40px;
               }
 
               .instruction {
                 font-size: 10pt;
-                margin-top: -10px;
+                margin-top: -15px;
                 margin-left: 15px;
-                margin-bottom: 0px;
+                margin-bottom: -4px;
               }
 
               .medicine {
@@ -338,8 +341,8 @@ export class MedicalPrescriptionService {
 
               .use-method {
                 font-size: 16pt;
-                margin-top: 30px;
-                margin-bottom: 15px;
+                margin-top: 10px;
+                margin-bottom: -5px;
               }
 
               .medicine-name, .medicine-quantity {

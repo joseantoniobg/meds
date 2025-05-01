@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { MedicalPrescriptionMedicineEntity } from './medical.prescription.medicine.entity';
 import { User } from '../../user/entities/user.entity';
+import { MedicalPrescriptionStatusEntity } from './medical.prescription.status.entity';
 
 @Entity('medical_prescription')
 export class MedicalPrescriptionEntity {
@@ -35,16 +36,27 @@ export class MedicalPrescriptionEntity {
   @Column({ type: 'date', name: 'initial_date' })
   initialDate: Date;
 
+  @Column({ type: 'date', name: 'last_printed', nullable: true })
+  lastPrinted: Date;
+
   @Column({ type: 'int' })
   renewal: number;
 
-  @Column({ type: 'smallint', default: 1 })
-  status: number;
+  @Column({ type: 'smallint', default: 1, name: 'status' })
+  statusId: number;
+
+  @ManyToOne(
+    () => MedicalPrescriptionStatusEntity,
+    (status) => status.id,
+  )
+  @JoinColumn({ name: 'status', referencedColumnName: 'id' })
+  status: MedicalPrescriptionStatusEntity;
 
   @OneToMany(
     () => MedicalPrescriptionMedicineEntity,
     (mpm) => mpm.medicalPrescription,
   )
+  @JoinColumn({ name: 'id', referencedColumnName: 'id_medical_prescription' })
   medicines: MedicalPrescriptionMedicineEntity[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })

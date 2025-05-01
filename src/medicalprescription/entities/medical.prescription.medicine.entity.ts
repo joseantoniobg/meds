@@ -21,6 +21,6 @@ export class MedicalPrescriptionMedicineEntity {
   @Column({ type: 'varchar', length: 255, name: 'instruction_of_use' })
   instructionOfUse: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 100 })
   quantity: string;
 }

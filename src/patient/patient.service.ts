@@ -41,27 +41,9 @@ export class PatientService {
     const fetchedPatients = await this.patientRepository.findAndCount({
       skip: (pagination.page - 1) * pagination.size,
       take: pagination.size,
-      select: {
-        id: true,
-        name: true,
-        prescriptions: {
-          id: true,
-          initialDate: true,
-          renewal: true,
-          medicines: {
-            instructionOfUse: true,
-            quantity: true,
-            medicine: {
-              id: true,
-              name: true,
-              useMethod: true,
-            },
-          },
-        }
-      },
-      where: { name: Like(`%${pagination.name.toUpperCase()}%`) },
-      order: { name: 'ASC' },
-      relations: ['prescriptions', 'prescriptions.medicines', 'prescriptions.medicines.medicine'],
+      where: { name: Like(`%${formatString(pagination.name)}%`), prescriptions: { status: { id: pagination.status } } },
+      order: { name: 'ASC', prescriptions: { createdAt: 'ASC' } },
+      relations: ['prescriptions', 'prescriptions.status', 'prescriptions.medicines', 'prescriptions.medicines.medicine'],
     });
 
     return {
