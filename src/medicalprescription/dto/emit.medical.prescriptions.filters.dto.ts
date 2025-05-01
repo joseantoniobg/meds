@@ -13,6 +13,10 @@ export default class EmitMedicalPrescriptionFiltersDto extends PageFilterDto {
   @ApiProperty({ description: 'Data da receita médica' })
   date: Date;
 
+  @ApiProperty({ description: 'Status da Receita' })
+  @IsOptional()
+  status?: number;
+
   @ApiProperty({ description: 'Se é a emissão automática diária (renovação das receitas)' })
   @Transform(({ value }) => value === 'true')
   dailyEmission: boolean;

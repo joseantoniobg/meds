@@ -182,8 +182,13 @@ export class MedicalPrescriptionService {
     }
 
     if (emissionFilters.patientId) {
-      sql += ` and p.id = $${filters.length + 1} AND mp.status = 1`;
+      sql += ` and p.id = $${filters.length + 1}`;
       filters.push(emissionFilters.patientId);
+    }
+
+    if (emissionFilters.status) {
+      sql += ` and mp.status = $${filters.length + 1}`;
+      filters.push(emissionFilters.status);
     }
 
     if (emissionFilters.dailyEmission) {
@@ -232,18 +237,24 @@ export class MedicalPrescriptionService {
   async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response) {
     const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters);
 
-    // const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
-    //   isDailyEmission: emissionFilters.dailyEmission,
-    //   date: new Date(),
-    // });
+    const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
+      isDailyEmission: emissionFilters.dailyEmission,
+      date: new Date(),
+    });
 
-    // const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
-    //   batchId: batch.id,
-    //   medicalPrescriptionId: mp.id,
-    //   isDailyEmission: emissionFilters.dailyEmission,
-    //   date: new Date(),
-    //   html: mp.html,
-    // })));
+    const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
+      batchId: batch.id,
+      medicalPrescriptionId: mp.id,
+      isDailyEmission: emissionFilters.dailyEmission,
+      date: new Date(),
+      html: mp.html,
+    })));
+
+    await this.medicalPrescriptionEmissionRepository.save(emission);
+
+    await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
+      lastPrinted: new Date(),
+    });
 
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">

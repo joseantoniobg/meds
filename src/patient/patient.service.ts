@@ -42,7 +42,7 @@ export class PatientService {
       skip: (pagination.page - 1) * pagination.size,
       take: pagination.size,
       where: { name: Like(`%${formatString(pagination.name)}%`), prescriptions: { status: { id: pagination.status } } },
-      order: { name: 'ASC', prescriptions: { createdAt: 'ASC' } },
+      order: { name: 'ASC' },
       relations: ['prescriptions', 'prescriptions.status', 'prescriptions.medicines', 'prescriptions.medicines.medicine'],
     });
 
