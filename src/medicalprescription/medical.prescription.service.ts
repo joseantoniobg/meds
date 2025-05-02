@@ -192,7 +192,7 @@ export class MedicalPrescriptionService {
     }
 
     if (emissionFilters.dailyEmission) {
-      sql += ` and next_working_day((coalesce(mp.last_printed, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and md.status = 1 AND mp.renewal > 0 AND mp.status = 1`;
+      sql += ` and next_working_day((coalesce(mp.last_printed, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and mp.status = 1 AND mp.renewal > 0 AND mp.status = 1`;
     }
 
     sql += `) t
@@ -252,9 +252,11 @@ export class MedicalPrescriptionService {
 
     await this.medicalPrescriptionEmissionRepository.save(emission);
 
-    await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
-      lastPrinted: new Date(),
-    });
+    if (emissionFilters.print) {
+      await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
+        lastPrinted: new Date(),
+      });
+    }
 
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">
@@ -369,7 +371,7 @@ export class MedicalPrescriptionService {
               }
             </style>
             <body>
-                ${medicalPrescriptions.content.map((mp) => mp.html).join('')}
+                ${medicalPrescriptions.totalRecords == 0 ? 'Não há receitas a serem impressas!' : medicalPrescriptions.content.map((mp) => mp.html).join('')}
             </body>
           </html>`;
 
