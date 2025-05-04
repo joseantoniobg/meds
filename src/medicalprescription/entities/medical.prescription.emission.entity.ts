@@ -21,6 +21,6 @@ export class MedicalPrescriptionEmissionEntity {
   @JoinColumn({ name: 'id_medical_prescription', referencedColumnName: 'id' })
   medicalPrescription: MedicalPrescriptionEntity;
 
-  @Column({ type: 'varchar', length: 2500 })
+  @Column({ type: 'varchar', length: 8000 })
   html: string;
 }

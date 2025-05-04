@@ -171,10 +171,10 @@ export class MedicalPrescriptionService {
           u.name AS username,
           u.crm
       FROM patient p
-      LEFT JOIN medical_prescription mp ON p.id = mp.id_patient ${emissionFilters.status === 1 ? ' and mp.status = 1' : ''}
-      LEFT JOIN medical_prescription_medicine mpm ON mp.id = mpm.id_medical_prescription
-      LEFT JOIN medicine m ON m.id = mpm.id_medicine
-      LEFT JOIN "user" u ON mp.id_user = u.id
+      INNER JOIN medical_prescription mp ON p.id = mp.id_patient ${emissionFilters.status === 1 ? ' and mp.status = 1' : ''}
+      INNER JOIN medical_prescription_medicine mpm ON mp.id = mpm.id_medical_prescription
+      INNER JOIN medicine m ON m.id = mpm.id_medicine
+      INNER JOIN "user" u ON mp.id_user = u.id
       WHERE 1 = 1`;
 
     if (emissionFilters.medicalPrescriptionIds) {
@@ -234,7 +234,7 @@ export class MedicalPrescriptionService {
 
     const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
       isDailyEmission: emissionFilters.dailyEmission,
-      date: new Date(),
+      date: emissionFilters.date ?? new Date(),
     });
 
     const emission = this.medicalPrescriptionEmissionRepository.create(medicalPrescriptions.content.map((mp) => ({
