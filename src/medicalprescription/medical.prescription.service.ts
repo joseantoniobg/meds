@@ -170,11 +170,11 @@ export class MedicalPrescriptionService {
 	        mpm.instruction_of_use,
           u.name AS username,
           u.crm
-      FROM medical_prescription mp
-      JOIN medical_prescription_medicine mpm ON mp.id = mpm.id_medical_prescription
-      JOIN patient p ON mp.id_patient = p.id
-      JOIN medicine m ON m.id = mpm.id_medicine
-      JOIN "user" u ON mp.id_user = u.id
+      FROM patient p
+      LEFT JOIN medical_prescription mp ON p.id = mp.id_patient ${emissionFilters.status === 1 ? ' and mp.status = 1' : ''}
+      LEFT JOIN medical_prescription_medicine mpm ON mp.id = mpm.id_medical_prescription
+      LEFT JOIN medicine m ON m.id = mpm.id_medicine
+      LEFT JOIN "user" u ON mp.id_user = u.id
       WHERE 1 = 1`;
 
     if (emissionFilters.medicalPrescriptionIds) {
@@ -184,11 +184,6 @@ export class MedicalPrescriptionService {
     if (emissionFilters.patientId) {
       sql += ` and p.id = $${filters.length + 1}`;
       filters.push(emissionFilters.patientId);
-    }
-
-    if (emissionFilters.status) {
-      sql += ` and mp.status = $${filters.length + 1}`;
-      filters.push(emissionFilters.status);
     }
 
     if (emissionFilters.dailyEmission) {

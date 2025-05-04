@@ -38,13 +38,28 @@ export class PatientService {
   }
 
   async findPatientsByName(pagination: PatientFiltersDto): Promise<PageResponseDto<PatientEntity>> {
-    const fetchedPatients = await this.patientRepository.findAndCount({
-      skip: (pagination.page - 1) * pagination.size,
-      take: pagination.size,
-      where: { name: Like(`%${formatString(pagination.name)}%`), prescriptions: { status: { id: pagination.status } } },
-      order: { name: 'ASC' },
-      relations: ['prescriptions', 'prescriptions.status', 'prescriptions.medicines', 'prescriptions.medicines.medicine'],
-    });
+    const fetchedPatients = await this.patientRepository.createQueryBuilder('patient')
+    .select(['patient.id',
+             'patient.name',
+             'prescription.id',
+             'prescription.renewal',
+             'prescription.initialDate',
+             'status.id',
+             'status.description',
+             'medicine.idMedicine',
+             'medicine.quantity',
+             'medicine.instructionOfUse',
+             'medicineEntity.id',
+             'medicineEntity.name',])
+    .leftJoin('patient.prescriptions', 'prescription', `${pagination.status ? 'prescription.status = :statusId' : ''}`, { statusId: pagination.status })
+    .leftJoin('prescription.status', 'status')
+    .leftJoin('prescription.medicines', 'medicine')
+    .leftJoin('medicine.medicine', 'medicineEntity')
+    .where('patient.name LIKE :name', { name: `%${formatString(pagination.name)}%` })
+    .orderBy('patient.name', 'ASC')
+    .skip((pagination.page - 1) * pagination.size)
+    .take(pagination.size)
+    .getManyAndCount();
 
     return {
       content: fetchedPatients[0],
