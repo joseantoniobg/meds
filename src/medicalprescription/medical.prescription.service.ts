@@ -296,7 +296,7 @@ export class MedicalPrescriptionService {
                 display: flex;
                 justify-content: start;
                 padding: 0 1cm;
-                margin-bottom: -5px;
+                margin-bottom: -30px;
               }
 
               .patient {
@@ -349,7 +349,7 @@ export class MedicalPrescriptionService {
 
               .use-method {
                 font-size: 16pt;
-                margin-top: 10px;
+                margin-top: 30px;
                 margin-bottom: -5px;
               }
 
