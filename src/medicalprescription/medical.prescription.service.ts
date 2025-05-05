@@ -167,6 +167,7 @@ export class MedicalPrescriptionService {
 	  from (select
 	        mp.id,
           mp.id_type,
+          mp.created_at,
 	        p.name,
 	        m.use_method,
 	        COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name) as row_med,
@@ -196,8 +197,8 @@ export class MedicalPrescriptionService {
     }
 
     sql += `) t
-      group by t.name, t.id, t.username, t.crm, t.id_type
-      order by t.name, t.id
+      group by t.name, t.id, t.username, t.crm, t.id_type, t.created_at
+      order by t.name, t.created_at
       offset ${(emissionFilters.page - 1) * emissionFilters.size} limit ${emissionFilters.size}`;
 
     const medicalPrescriptions = await queryRunner.query(sql, filters);
