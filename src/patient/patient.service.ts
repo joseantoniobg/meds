@@ -44,6 +44,8 @@ export class PatientService {
              'prescription.id',
              'prescription.renewal',
              'prescription.initialDate',
+             'typeMd.id',
+             'typeMd.description',
              'status.id',
              'status.description',
              'medicine.idMedicine',
@@ -53,6 +55,7 @@ export class PatientService {
              'medicineEntity.name',])
     .leftJoin('patient.prescriptions', 'prescription', `${pagination.status ? 'prescription.status = :statusId' : ''}`, { statusId: pagination.status })
     .leftJoin('prescription.status', 'status')
+    .leftJoin('prescription.type', 'typeMd')
     .leftJoin('prescription.medicines', 'medicine')
     .leftJoin('medicine.medicine', 'medicineEntity')
     .where('patient.name LIKE :name', { name: `%${formatString(pagination.name)}%` })

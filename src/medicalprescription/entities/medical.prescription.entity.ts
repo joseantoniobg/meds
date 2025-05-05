@@ -13,6 +13,7 @@ import {
 import { MedicalPrescriptionMedicineEntity } from './medical.prescription.medicine.entity';
 import { User } from '../../user/entities/user.entity';
 import { MedicalPrescriptionStatusEntity } from './medical.prescription.status.entity';
+import { MedicalPrescriptionTypeEntity } from './medical.prescription.type.entity';
 
 @Entity('medical_prescription')
 export class MedicalPrescriptionEntity {
@@ -51,6 +52,16 @@ export class MedicalPrescriptionEntity {
   )
   @JoinColumn({ name: 'status', referencedColumnName: 'id' })
   status: MedicalPrescriptionStatusEntity;
+
+  @Column({ type: 'smallint', nullable: true, name: 'id_type', default: 1 })
+  typeId: number;
+
+  @ManyToOne(
+    () => MedicalPrescriptionTypeEntity,
+    (type) => type.id,
+  )
+  @JoinColumn({ name: 'id_type', referencedColumnName: 'id' })
+  type: MedicalPrescriptionTypeEntity;
 
   @OneToMany(
     () => MedicalPrescriptionMedicineEntity,

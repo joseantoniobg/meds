@@ -36,6 +36,7 @@ export class MedicalPrescriptionService {
       initialDate: medicalPrescriptionDto.initialDate,
       renewal: medicalPrescriptionDto.renewal,
       userId: user.id,
+      typeId: medicalPrescriptionDto.blue ? 2 : 1,
    });
 
    const medicalPrescriptionSaved = await this.medicalPrescriptionRepository.save(medicalPrescription);
@@ -126,8 +127,11 @@ export class MedicalPrescriptionService {
 
     let sql = `SELECT COUNT(1) OVER () as total,
          t.id,
-         CONCAT('<div class="md">
-	              <div class="md-header">
+         CONCAT('<div class="md">',
+                 CASE WHEN t.id_type = 2 THEN '<div class="md-blue">
+                                              RECEITA AZUL
+                                            </div>' ELSE '' END,
+	              '<div class="md-header">
 	                <div>
 	                  <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
 	                </div>
@@ -162,6 +166,7 @@ export class MedicalPrescriptionService {
 			  </div>') as html
 	  from (select
 	        mp.id,
+          mp.id_type,
 	        p.name,
 	        m.use_method,
 	        COUNT(1) OVER (PARTITION BY mp.id, m.use_method order by m.use_method, m.name) as row_med,
@@ -191,7 +196,7 @@ export class MedicalPrescriptionService {
     }
 
     sql += `) t
-      group by t.name, t.id, t.username, t.crm
+      group by t.name, t.id, t.username, t.crm, t.id_type
       order by t.name, t.id
       offset ${(emissionFilters.page - 1) * emissionFilters.size} limit ${emissionFilters.size}`;
 
@@ -253,6 +258,12 @@ export class MedicalPrescriptionService {
       });
     }
 
+    if (emissionFilters.renewal) {
+      await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
+        renewal: emissionFilters.renewal,
+      });
+    }
+
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">
             <head>
@@ -261,15 +272,17 @@ export class MedicalPrescriptionService {
               <title>MDs</title>
             </head>
             <style>
-              body {
+                           body {
                 display: grid;
                 grid-template-columns: repeat(2, 15cm);
               }
 
               .md {
+                position: relative;
                 width: 15cm;
-                min-height: 21cm;
+                max-height: 21cm;
                 border-right: 1px solid black;
+                overflow: hidden;
               }
 
               .md-header {
@@ -363,6 +376,18 @@ export class MedicalPrescriptionService {
                 margin-left: 5px;
                 margin-right: 5px;
                 margin-top: 28px;
+              }
+
+              .md-blue {
+                width: 800px;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: 800;
+                line-height: 1;
+                position: absolute;
+                font-size: 140px;
+                text-align: center;
+                transform: rotate(-60deg) translate(-35%, 20%);
+                color: rgba(0, 0, 0, 0.1);
               }
             </style>
             <body>

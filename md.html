@@ -1,134 +1,163 @@
 <!DOCTYPE html>
-<html lang="pt-Br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MDs</title>
-</head>
-<style>
-  body {
-    display: grid;
-    grid-template-columns: repeat(2, 15cm);
-  }
+            <html lang="pt-Br">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>MDs</title>
+            </head>
+            <style>
+              body {
+                display: grid;
+                grid-template-columns: repeat(2, 15cm);
+              }
 
-  .md {
-    width: 15cm;
-    height: 20cm;
-    border-right: 1px solid black;
-  }
+              .md {
+                position: relative;
+                width: 15cm;
+                max-height: 21cm;
+                border-right: 1px solid black;
+                overflow: hidden;
+              }
 
-  .md-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 1cm;
-  }
+              .md-header {
+                display: flex;
+                justify-content: space-between;
+                padding: 1cm;
+                margin-bottom: -30px;
+                margin-top: -10px;
+              }
 
-  .logo {
-    max-height: 110px;
-    padding-left: 20px;
-  }
+              .logo {
+                max-height: 90px;
+                padding-left: 20px;
+              }
 
-  .title {
-    margin-top: -5px;
-    text-align: center;
-    line-height: 0.2;
-  }
+              .title {
+                margin-top: -10px;
+                text-align: center;
+                line-height: 0.2;
+                padding: 0 10px;
+              }
 
-  .md-patient {
-    display: flex;
-    justify-content: start;
-    padding: 0 1cm;
-    margin-bottom: -20px;
-  }
+              .md-patient {
+                display: flex;
+                justify-content: start;
+                padding: 0 1cm;
+                margin-bottom: -30px;
+              }
 
-  .patient {
-    font-weight: bold;
-    border-bottom: 1px solid black;
-    width: 100%;
-    margin-left: 10px;
-  }
+              .patient {
+                font-weight: bold;
+                border-bottom: 1px solid black;
+                width: 100%;
+                margin-left: 10px;
+              }
 
-  .md-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 1cm 1cm 1cm;
-  }
+              .md-footer {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 1cm 1cm 1cm;
+              }
 
-  .signature {
-    width: 300px;
-    border-top: 1px solid black;
-    text-align: center;
-    padding-top: 5px;
-  }
+              .signature {
+                width: 300px;
+                border-top: 1px solid black;
+                text-align: center;
+                padding-top: 5px;
+              }
 
-  .md-body {
-    height: 11cm;
-    padding: 0 1cm;
-    line-height: 0;
-  }
+              .md-body {
+                min-height: 12cm;
+                padding: 0 1cm;
+                margin-bottom: 40px;
+              }
 
-  .instruction {
-    font-size: 10pt;
-    margin-top: -2px;
-    margin-left: 15px;
-  }
+              .instruction {
+                font-size: 10pt;
+                margin-top: -15px;
+                margin-left: 15px;
+                margin-bottom: -4px;
+              }
 
-  .medicine {
-    display: flex;
-    justify-content: space-between;
-  }
+              .medicine {
+                display: flex;
+                justify-content: space-between;
+              }
 
-  .medicine-name {
-    font-weight: bold;
-  }
+              .medicine-row {
+                font-weight: bold;
+                margin-right: 5px;
+              }
 
-  .use-method {
-    font-size: 16pt;
-    margin-top: 30px;
-    margin-bottom: 15px;
-  }
+              .medicine-name {
+                font-weight: bold;
+                max-width: 8cm;
+              }
 
-  .medicine-name, .medicine-quantity {
-    flex-shrink: 0;
-  }
+              .use-method {
+                font-size: 16pt;
+                margin-top: 30px;
+                margin-bottom: -5px;
+              }
 
-  .line {
-    flex-grow: 1;
-    border-bottom: 1px dashed black;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 20px;
-  }
-</style>
-<body>
-    <div class="md">
-      <div class="md-header">
-        <div>
-          <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
-        </div>
-        <div class="title">
-          <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>
-          <p>PSF 2 – SÃO FRANCISCO DE ASSIS</p>
-          <p>TELEFONE:3533-1415</p>
-          <p>CENTRO</p>
-        </div>
-      </div>
-      <div class="md-patient">
-        <p>Nome:</p>
-        <p class="patient">BENEDICTA ARANTES FERREIRA</p>
-      </div>
-      <div class="md-body">
-        <div class="medicine">
-          <p class="medicine-name">1) NEURAL 50MG</p>
-          <p class="line"></p>
-          <p class="medicine-quantity">1 CAIXA</p>
-        </div>
-        <p class="instruction">TOMAR 1 COMPRIMIDO POR DIA.</p>
-        <div class="md-footer">
-          <p>26/04/2025</p>
-           <p class="signature">ASSINATURA DO MÉDICO - CRM</p>
-          </div>
-        </div>
-      </div><div class="md">              <div class="md-header">                <div>                  <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">                </div>                <div class="title">                  <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>                  <p>PSF 2 – SÃO FRANCISCO DE ASSIS</p>                  <p>TELEFONE:3533-1415</p>                  <p>CENTRO</p>                </div>              </div>  <div class="md-patient">        <p>Nome:</p>        <p class="patient">BENEDICTA ARANTES FERREIRA</p>      </div>      <div class="md-body">                  <p class="use-method">USO ORAL:</p>                   <div class="medicine">          <p class="medicine-name">1) DELLER 50MG</p>          <p class="line"></p>          <p class="medicine-quantity">1 CAIXA</p>        </div>        <p class="instruction">TOMAR UM COMPRIMIDO POR DIA.</p>                               <div class="medicine">          <p class="medicine-name">2) OLANZAPINA 5MG</p>          <p class="line"></p>          <p class="medicine-quantity">1 CAIXA</p>        </div>        <p class="instruction">TOMAR 1 COMPRIMIDO A NOITE.</p>                               <div class="md-footer">        <p>26/04/2025</p>        <p class="signature">ASSINATURA DO MÉDICO - CRM</p>    </div>  </div>      </div>
-</body>
-</html>
+              .medicine-name, .medicine-quantity {
+                flex-shrink: 0;
+              }
+
+              .line {
+                flex-grow: 1;
+                border-top: 1px dashed black;
+                margin-left: 5px;
+                margin-right: 5px;
+                margin-top: 28px;
+              }
+
+              .md-blue {
+                width: 800px;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: 800;
+                line-height: 1;
+                position: absolute;
+                font-size: 140px;
+                text-align: center;
+                transform: rotate(-60deg) translate(-35%, 20%);
+                color: rgba(0, 0, 0, 0.1);
+              }
+            </style>
+            <body>
+                <div class="md">
+                  <div class="md-blue">
+                    RECEITA AZUL
+                  </div>
+	              <div class="md-header">
+	                <div>
+	                  <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
+	                </div>
+	                <div class="title">
+	                  <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>
+	                  <p>PSF 2 – SÃO FRANCISCO DE ASSIS</p>
+	                  <p>TELEFONE:3533-1415</p>
+	                  <p>CENTRO</p>
+	                </div>
+	              </div>
+				  <div class="md-patient">
+			        <p>Nome:</p>
+			        <p class="patient">PACIENTE TAL</p>
+			      </div>
+			      <div class="md-body">
+                  <p class="use-method">USO ORAL:</p>
+                   <div class="medicine">
+                      <p class="medicine-row">1)</p>
+						          <p class="medicine-name">ALPRAZOLAM 1,0MG</p>
+						          <p class="line"></p>
+						          <p class="medicine-quantity">DUAS CAIXAS</p>
+						        </div>
+						        <p class="instruction">TOMAR 1 COMPRIMIDO DE 12 EM 12 HORAS.</p>
+                               </div>
+             <div class="md-footer">
+			        <p>04/05/2025</p>
+			        <p class="signature"> DR. MEDICO FULANO<br>CRM MG 12332124</p>
+			    </div>
+			  </div>
+            </body>
+          </html>

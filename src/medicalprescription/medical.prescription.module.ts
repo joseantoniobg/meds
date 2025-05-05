@@ -11,6 +11,7 @@ import { HolidayEntity } from './entities/holiday.entity';
 import { MedicalPrescriptionEmissionBatchEntity } from './entities/medical.prescription.emission.batch.entity';
 import { UserModule } from '../user/user.module';
 import { MedicalPrescriptionStatusEntity } from './entities/medical.prescription.status.entity';
+import { MedicalPrescriptionTypeEntity } from './entities/medical.prescription.type.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PatientEntity, MedicineEntity,
@@ -18,7 +19,8 @@ import { MedicalPrescriptionStatusEntity } from './entities/medical.prescription
                                       MedicalPrescriptionMedicineEntity,
                                       MedicalPrescriptionEmissionEntity,
                                       MedicalPrescriptionEmissionBatchEntity,
-                                      MedicalPrescriptionStatusEntity,]),
+                                      MedicalPrescriptionStatusEntity,
+                                      MedicalPrescriptionTypeEntity,]),
             UserModule],
   controllers: [MedicalPrescriptionController],
   providers: [MedicalPrescriptionService]
