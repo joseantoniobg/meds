@@ -5,7 +5,7 @@ import { Transform } from "class-transformer";
 
 export default class EmitMedicalPrescriptionFiltersDto extends PageFilterDto {
   @ApiProperty({ description: 'Ids da receita médicas' })
-  @Transform(({ value }) => value.split(','))
+  @Transform(({ value }) => value ? value?.split(',') : undefined)
   @IsArray({ message: 'Ids da Receitas deve ser um array' })
   @IsOptional()
   medicalPrescriptionIds: string[];
