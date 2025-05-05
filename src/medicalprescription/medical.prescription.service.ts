@@ -193,7 +193,7 @@ export class MedicalPrescriptionService {
     }
 
     if (emissionFilters.dailyEmission) {
-      sql += ` and next_working_day((coalesce(mp.last_printed, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and mp.status = 1 AND mp.renewal > 0 AND mp.status = 1`;
+      sql += ` and next_working_day((coalesce(mp.last_printed, mp.initial_date) + mp.renewal * interval '1 day')::DATE) = now()::DATE and mp.status = 1 AND mp.renewal > 0`;
     }
 
     sql += `) t
@@ -232,6 +232,7 @@ export class MedicalPrescriptionService {
       throw new HttpException('Receita médica já cancelada', 400);
     }
     medicalPrescription.statusId = 0;
+    medicalPrescription.renewalDate = null;
     await this.medicalPrescriptionRepository.save(medicalPrescription);
   }
 
@@ -253,16 +254,24 @@ export class MedicalPrescriptionService {
 
     await this.medicalPrescriptionEmissionRepository.save(emission);
 
-    if (emissionFilters.print) {
       await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
-        lastPrinted: new Date(),
+        lastPrinted: emissionFilters.date ?? new Date(),
       });
-    }
 
     if (emissionFilters.renewal) {
       await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
         renewal: emissionFilters.renewal,
       });
+    }
+
+    if (medicalPrescriptions.content.length > 0) {
+      const queryRunner = this.medicalPrescriptionRepository.manager.connection.createQueryRunner();
+
+      await queryRunner.query(`UPDATE "medical_prescription"
+                              SET renewal_date = case when status = 1 AND renewal > 0 then next_working_day((coalesce(last_printed, initial_date) + renewal * interval '1 day')::DATE) else null end
+                              WHERE id IN (${medicalPrescriptions.content.map((mp) => `'${mp.id}'`).join(',')})`);
+
+      await queryRunner.release();
     }
 
     const html = `<!DOCTYPE html>

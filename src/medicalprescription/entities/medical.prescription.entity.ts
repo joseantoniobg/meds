@@ -63,6 +63,9 @@ export class MedicalPrescriptionEntity {
   @JoinColumn({ name: 'id_type', referencedColumnName: 'id' })
   type: MedicalPrescriptionTypeEntity;
 
+  @Column({ type: 'date', name: 'renewal_date', nullable: true })
+  renewalDate: Date;
+
   @OneToMany(
     () => MedicalPrescriptionMedicineEntity,
     (mpm) => mpm.medicalPrescription,
