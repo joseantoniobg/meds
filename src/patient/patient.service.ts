@@ -53,7 +53,8 @@ export class PatientService {
              'medicine.instructionOfUse',
              'medicineEntity.id',
              'medicineEntity.name',])
-    .leftJoin('patient.prescriptions', 'prescription', `${pagination.status ? 'prescription.status = :statusId' : ''}`, { statusId: pagination.status })
+    .addSelect(`case when status.id = 1 AND prescription.renewal > 0 then TO_CHAR(next_working_day((coalesce(prescription.last_printed, prescription.initial_date) + prescription.renewal * interval '1 day')::DATE), 'DD/MM/YYYY') else '-' end`, 'nextPrint')
+    .leftJoin('patient.prescriptions', 'prescription', `prescription.id_patient = patient.id ${pagination.status ? 'and prescription.status = :statusId' : ''}`, { statusId: pagination.status })
     .leftJoin('prescription.status', 'status')
     .leftJoin('prescription.type', 'typeMd')
     .leftJoin('prescription.medicines', 'medicine')
