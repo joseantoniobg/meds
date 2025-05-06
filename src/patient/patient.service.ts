@@ -103,6 +103,8 @@ export class PatientService {
 
     const totalMeds = await query.query(sqlQuery, filters);
 
+    await query.release();
+
     return {
       content: fetchedPatients[0],
       totalRecords: fetchedPatients[1],
