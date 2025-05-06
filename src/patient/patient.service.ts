@@ -94,6 +94,11 @@ export class PatientService {
       filters.push(pagination.lastPrinted);
     }
 
+    if (pagination.status) {
+      sqlQuery += ` AND mp.id_status = $${filters.length + 1}`;
+      filters.push(pagination.status);
+    }
+
     const fetchedPatients = await fetch.getManyAndCount();
 
     const totalMeds = await query.query(sqlQuery, filters);
