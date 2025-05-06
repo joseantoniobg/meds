@@ -254,17 +254,17 @@ export class MedicalPrescriptionService {
 
     await this.medicalPrescriptionEmissionRepository.save(emission);
 
+    if (medicalPrescriptions.content.length > 0) {
+      if (emissionFilters.renewal) {
+        await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
+          renewal: emissionFilters.renewal,
+        });
+      }
+
       await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
         lastPrinted: emissionFilters.date ?? new Date(),
       });
 
-    if (emissionFilters.renewal) {
-      await this.medicalPrescriptionRepository.update(medicalPrescriptions.content.map((mp) => mp.id), {
-        renewal: emissionFilters.renewal,
-      });
-    }
-
-    if (medicalPrescriptions.content.length > 0) {
       const queryRunner = this.medicalPrescriptionRepository.manager.connection.createQueryRunner();
 
       await queryRunner.query(`UPDATE "medical_prescription"
@@ -282,7 +282,7 @@ export class MedicalPrescriptionService {
               <title>MDs</title>
             </head>
             <style>
-                           body {
+              body {
                 display: grid;
                 grid-template-columns: repeat(2, 15cm);
               }
@@ -401,7 +401,7 @@ export class MedicalPrescriptionService {
               }
             </style>
             <body>
-                ${medicalPrescriptions.totalRecords == 0 ? 'Não há receitas a serem impressas!' : medicalPrescriptions.content.map((mp) => mp.html).join('')}
+                ${medicalPrescriptions.totalRecords == 0 ? '<h1>Não há receitas a serem impressas!</h1>' : medicalPrescriptions.content.map((mp) => mp.html).join('')}
             </body>
           </html>`;
 
