@@ -95,7 +95,7 @@ export class PatientService {
     }
 
     if (pagination.status) {
-      sqlQuery += ` AND mp.id_status = $${filters.length + 1}`;
+      sqlQuery += ` AND mp.status = $${filters.length + 1}`;
       filters.push(pagination.status);
     }
 
