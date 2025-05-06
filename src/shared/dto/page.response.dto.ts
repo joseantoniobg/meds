@@ -35,4 +35,11 @@ export class PageResponseDto<T> {
     example: 1
   })
   totalRecords: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Total de Receitas Médicas',
+    example: 1
+  })
+  totalMds?: number;
 }

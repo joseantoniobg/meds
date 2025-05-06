@@ -38,7 +38,7 @@ export class PatientService {
   }
 
   async findPatientsByName(pagination: PatientFiltersDto): Promise<PageResponseDto<PatientEntity>> {
-    const fetchedPatients = await this.patientRepository.createQueryBuilder('patient')
+    const fetch = this.patientRepository.createQueryBuilder('patient')
     .select(['patient.id',
              'patient.name',
              'prescription.id',
@@ -55,7 +55,6 @@ export class PatientService {
              'medicine.instructionOfUse',
              'medicineEntity.id',
              'medicineEntity.name',])
-    .addSelect(`case when status.id = 1 AND prescription.renewal > 0 then TO_CHAR(next_working_day((coalesce(prescription.last_printed, prescription.initial_date) + prescription.renewal * interval '1 day')::DATE), 'DD/MM/YYYY') else '-' end`, 'nextPrint')
     .leftJoin('patient.prescriptions', 'prescription', `prescription.id_patient = patient.id ${pagination.status ? 'and prescription.status = :statusId' : ''}`, { statusId: pagination.status })
     .leftJoin('prescription.status', 'status')
     .leftJoin('prescription.type', 'typeMd')
@@ -64,8 +63,40 @@ export class PatientService {
     .where('patient.name LIKE :name', { name: `%${formatString(pagination.name)}%` })
     .orderBy('patient.name', 'ASC')
     .skip((pagination.page - 1) * pagination.size)
-    .take(pagination.size)
-    .getManyAndCount();
+    .take(pagination.size);
+
+    if (pagination.renewalDate) {
+      fetch.andWhere('prescription.renewalDate = :renewalDate', { renewalDate: pagination.renewalDate });
+    }
+
+    if (pagination.lastPrinted) {
+      fetch.andWhere('prescription.last_printed = :lastPrinted', { lastPrinted: pagination.lastPrinted });
+    }
+
+    const query = this.patientRepository.manager.connection.createQueryRunner();
+
+    const filters = Array<any>();
+
+    let sqlQuery = `SELECT COUNT(DISTINCT mp.id) as total
+                      FROM medical_prescription mp
+                      JOIN patient p ON p.id = mp.id_patient
+                      WHERE p.name LIKE $1`;
+
+    filters.push(`%${formatString(pagination.name)}%`);
+
+    if (pagination.renewalDate) {
+      sqlQuery += ` AND mp.renewal_date = $${filters.length + 1}`;
+      filters.push(pagination.renewalDate);
+    }
+
+    if (pagination.lastPrinted) {
+      sqlQuery += ` AND mp.last_printed = $${filters.length + 1}`;
+      filters.push(pagination.lastPrinted);
+    }
+
+    const fetchedPatients = await fetch.getManyAndCount();
+
+    const totalMeds = await query.query(sqlQuery, filters);
 
     return {
       content: fetchedPatients[0],
@@ -73,6 +104,7 @@ export class PatientService {
       totalPages: Math.ceil(fetchedPatients[1] / pagination.size),
       page: pagination.page,
       size: pagination.size,
+      totalMds: +totalMeds[0].total,
     }
   }
 }
