@@ -161,7 +161,7 @@ export class MedicalPrescriptionService {
              '</div>
              <div class="md-footer">
 			        <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
-			        <p class="signature"> DR. ', t.username, '<br>', t.crm, '</p>
+			        <p class="signature">', t.username, '<br>', t.crm, '</p>
 			    </div>
 			  </div>') as html
 	  from (select
