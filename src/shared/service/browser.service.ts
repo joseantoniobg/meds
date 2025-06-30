@@ -7,7 +7,9 @@ export class BrowserService implements OnModuleInit, OnApplicationShutdown {
   private browser: Browser;
 
   async onModuleInit() {
-    this.browser = await puppeteer.launch();
+    this.browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
   }
 
   async onApplicationShutdown(signal?: string) {
