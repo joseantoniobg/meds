@@ -407,8 +407,6 @@ export class MedicalPrescriptionService {
             </body>
           </html>`;
 
-    console.log('Gerando PDF...', html);
-
      const pdfBuffer = await this.pdfService.generatePdfFromHtml(html);
 
       response.set({
