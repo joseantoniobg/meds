@@ -15,6 +15,7 @@ import { Response } from 'express';
 import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
 import { UserService } from '../user/user.service';
 import { isUUID } from 'class-validator';
+import { PdfService } from '../shared/service/pdf.service';
 
 @Injectable()
 export class MedicalPrescriptionService {
@@ -22,7 +23,8 @@ export class MedicalPrescriptionService {
               @InjectRepository(MedicalPrescriptionMedicineEntity) private readonly medicalPrescriptionMedicineRepository: Repository<MedicalPrescriptionMedicineEntity>,
               @InjectRepository(MedicalPrescriptionEmissionEntity) private readonly medicalPrescriptionEmissionRepository: Repository<MedicalPrescriptionEmissionEntity>,
               @InjectRepository(MedicalPrescriptionEmissionBatchEntity) private readonly medicalPrescriptionEmissionBatchRepository: Repository<MedicalPrescriptionEmissionBatchEntity>,
-              private readonly userService: UserService) {}
+              private readonly userService: UserService,
+            private readonly pdfService: PdfService) {}
 
   async create(medicalPrescriptionDto: MedicalPrescriptionDto, token: TokenPayloadDto): Promise<MedicalPrescriptionEntity> {
     const user = await this.userService.getById(token.id);
@@ -290,7 +292,7 @@ export class MedicalPrescriptionService {
               .md {
                 position: relative;
                 width: 15cm;
-                max-height: 21cm;
+                max-height: 20.5cm;
                 border-right: 1px solid black;
                 overflow: hidden;
               }
@@ -405,7 +407,16 @@ export class MedicalPrescriptionService {
             </body>
           </html>`;
 
-    response.setHeader('Content-Type', 'text/html');
-    response.send(html);
+    console.log('Gerando PDF...', html);
+
+     const pdfBuffer = await this.pdfService.generatePdfFromHtml(html);
+
+      response.set({
+        'Content-Type': 'application/pdf',
+        'Content-Length': pdfBuffer.length,
+        'Content-Disposition': 'attachment; filename=generated.pdf',
+      });
+
+      response.send(pdfBuffer);
   }
 }

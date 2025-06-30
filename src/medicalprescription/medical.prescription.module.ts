@@ -12,6 +12,7 @@ import { MedicalPrescriptionEmissionBatchEntity } from './entities/medical.presc
 import { UserModule } from '../user/user.module';
 import { MedicalPrescriptionStatusEntity } from './entities/medical.prescription.status.entity';
 import { MedicalPrescriptionTypeEntity } from './entities/medical.prescription.type.entity';
+import { PdfModule } from '../shared/service/pdf.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PatientEntity, MedicineEntity,
@@ -21,8 +22,9 @@ import { MedicalPrescriptionTypeEntity } from './entities/medical.prescription.t
                                       MedicalPrescriptionEmissionBatchEntity,
                                       MedicalPrescriptionStatusEntity,
                                       MedicalPrescriptionTypeEntity,]),
-            UserModule],
+            UserModule,
+            PdfModule],
   controllers: [MedicalPrescriptionController],
-  providers: [MedicalPrescriptionService]
+  providers: [MedicalPrescriptionService],
 })
 export class MedicalPrescriptionModule {}
