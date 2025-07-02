@@ -99,7 +99,8 @@ export class UserService {
         'user.login',
         'user.name',
         'user.refreshToken',
-        'user.updatePassword'
+        'user.updatePassword',
+        'user.readOnly',
       ])
       .where('user.id = :id AND user.status = :status', { id, status: 1 })
       .getOne();

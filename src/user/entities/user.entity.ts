@@ -40,6 +40,13 @@ export class User {
   crm: string;
 
   @ApiProperty({
+    description: 'Se o usuário é somente leitura',
+    example: false,
+  })
+  @Column({ type: 'boolean', name: 'read_only', nullable: true })
+  readOnly: boolean;
+
+  @ApiProperty({
     description: 'Status (1 - ativo, 0 - inativo)',
     example: 1,
   })
