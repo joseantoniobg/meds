@@ -135,7 +135,7 @@ export class MedicalPrescriptionService {
                                             </div>' ELSE '' END,
 	              '<div class="md-header">
 	                <div>
-	                  <img class="logo" src="https://seeklogo.com/images/S/sus-logo-E2EA177DC0-seeklogo.com.png" alt="Logo">
+	                  <img class="logo" src="https://drive.google.com/thumbnail?id=19oJmJs10uHJSn5RocF3sUt5ttmCJj3gm" alt="sus-Logo">
 	                </div>
 	                <div class="title">
 	                  <h4>PREFEITURA MUNICIPAL DE PRATÁPOLIS</h4>
