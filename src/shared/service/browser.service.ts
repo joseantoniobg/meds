@@ -1,24 +1,48 @@
-import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnApplicationShutdown,
+  Logger,
+} from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 import { Browser } from 'puppeteer';
 
 @Injectable()
 export class BrowserService implements OnModuleInit, OnApplicationShutdown {
-  private browser: Browser;
+  private browser: Browser | null = null;
+  private readonly logger = new Logger(BrowserService.name);
 
   async onModuleInit() {
-    this.browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    try {
+      await this.initBrowser();
+    } catch (err) {
+      this.logger.warn('Initial browser launch failed; will retry on demand');
+    }
   }
 
   async onApplicationShutdown(signal?: string) {
     if (this.browser) {
-      await this.browser.close();
+      try {
+        await this.browser.close();
+      } catch (err) {
+        this.logger.error('Error closing browser on shutdown', err as any);
+      }
+      this.browser = null;
     }
   }
 
-  getBrowser(): Browser {
-    return this.browser;
+  private async initBrowser(): Promise<void> {
+    if (this.browser) return;
+    this.browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    this.logger.log('Puppeteer browser launched');
+  }
+
+  async getBrowser(): Promise<Browser> {
+    if (!this.browser) {
+      await this.initBrowser();
+    }
+    return this.browser as Browser;
   }
 }
