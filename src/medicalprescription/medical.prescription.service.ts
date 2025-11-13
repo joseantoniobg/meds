@@ -11,7 +11,7 @@ import { MedicalPrescriptionEmissionEntity } from './entities/medical.prescripti
 import { MedicalPrescriptionEmissionBatchEntity } from './entities/medical.prescription.emission.batch.entity';
 import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
 import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
-import { Response } from 'express';
+import e, { Response } from 'express';
 import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
 import { UserService } from '../user/user.service';
 import { isUUID } from 'class-validator';
@@ -161,10 +161,12 @@ export class MedicalPrescriptionService {
 						        <p class="instruction">', t.instruction_of_use, '.</p>
                                '), '' ORDER BY t.use_method, t.row_med ASC),
              '</div>
-             <div class="md-footer">
-			        <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
-			        <p class="signature">', t.username, '<br>', t.crm, '</p>
-			    </div>
+             <div class="md-center">
+              <div class="md-footer">
+                <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
+                <p class="signature">', t.username, '<br>', t.crm, '</p>
+              </div>
+            </div>
 			  </div>') as html
 	  from (select
 	        mp.id,
@@ -276,6 +278,15 @@ export class MedicalPrescriptionService {
       await queryRunner.release();
     }
 
+    const isStandardLayout = emissionFilters.layout === 'standard';
+
+    const gridLayout = isStandardLayout ? 'repeat(2, 15cm)' : 'repeat(1, 21cm)';
+    const width = isStandardLayout ? '15cm' : '19cm';
+    const height = isStandardLayout ? '20.5cm' : '29.7cm';
+    const border = isStandardLayout ? 'border-right: 1px solid black;' : 'margin: 1cm 0 0 0.7cm;';
+    const bodyMinHeight = isStandardLayout ? '12cm' : '18cm';
+    const footerWidth = isStandardLayout ? '14cm;' : '16cm;';
+
     const html = `<!DOCTYPE html>
             <html lang="pt-Br">
             <head>
@@ -286,14 +297,14 @@ export class MedicalPrescriptionService {
             <style>
               body {
                 display: grid;
-                grid-template-columns: repeat(2, 15cm);
+                grid-template-columns: ${gridLayout};
               }
 
               .md {
                 position: relative;
-                width: 15cm;
-                max-height: 20.5cm;
-                border-right: 1px solid black;
+                width: ${width};
+                max-height: ${height};
+                ${border}
                 overflow: hidden;
               }
 
@@ -335,6 +346,7 @@ export class MedicalPrescriptionService {
                 display: flex;
                 justify-content: space-between;
                 padding: 0 1cm 1cm 1cm;
+                width: ${footerWidth};
               }
 
               .signature {
@@ -345,9 +357,15 @@ export class MedicalPrescriptionService {
               }
 
               .md-body {
-                min-height: 12cm;
+                min-height: ${bodyMinHeight};
                 padding: 0 1cm;
                 margin-bottom: 40px;
+              }
+
+              .md-center {
+                display: flex;
+                justify-content: center;
+                align-items: center;
               }
 
               .instruction {
@@ -396,9 +414,9 @@ export class MedicalPrescriptionService {
                 font-weight: 800;
                 line-height: 1;
                 position: absolute;
-                font-size: 140px;
+                font-size: ${isStandardLayout ? '140' : '210'}px;
                 text-align: center;
-                transform: rotate(-60deg) translate(-35%, 20%);
+                transform: rotate(-60deg) translate(-35%, ${isStandardLayout ? '20' : '40'}%);
                 color: rgba(0, 0, 0, 0.1);
               }
             </style>
@@ -407,7 +425,7 @@ export class MedicalPrescriptionService {
             </body>
           </html>`;
 
-     const pdfBuffer = await this.pdfService.generatePdfFromHtml(html);
+     const pdfBuffer = await this.pdfService.generatePdfFromHtml(html, emissionFilters.layout === 'standard');
 
       response.set({
         'Content-Type': 'application/pdf',

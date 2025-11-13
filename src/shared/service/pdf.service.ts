@@ -7,7 +7,7 @@ export class PdfService {
 
   constructor(private readonly browserService: BrowserService) {}
 
-  async generatePdfFromHtml(html: string): Promise<Buffer> {
+  async generatePdfFromHtml(html: string, landscape: boolean): Promise<Buffer> {
     const browser = await this.browserService.getBrowser();
     const page = await browser.newPage();
 
@@ -16,7 +16,7 @@ export class PdfService {
       const pdf = await page.pdf({
         format: 'A4',
         margin: { top: 0, bottom: 0, left: 0, right: 0 },
-        landscape: true,
+        landscape,
         printBackground: true,
       });
 

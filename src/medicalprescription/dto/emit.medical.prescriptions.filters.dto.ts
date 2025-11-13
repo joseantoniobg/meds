@@ -35,4 +35,8 @@ export default class EmitMedicalPrescriptionFiltersDto extends PageFilterDto {
   @IsUUID('4', { message: 'Id do paciente deve ser um UUID' })
   @IsOptional()
   patientId: string;
+
+  @ApiProperty({ description: 'Layout da receita médica', enum: ['standard', 'A4'], default: 'standard' })
+  @IsOptional()
+  layout?: 'standard' | 'A4' = 'standard';
 }
