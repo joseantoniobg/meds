@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { MedicineModule } from './medicine/medicine.module';
 import { MedicalPrescriptionEntity } from './medicalprescription/entities/medical.prescription.entity';
 import { MedicalPrescriptionModule } from './medicalprescription/medical.prescription.module';
+import { HolidayModule } from './holiday/holiday.module';
 
 @Module({
   imports: [ ConfigModule.forRoot({
@@ -21,6 +22,7 @@ import { MedicalPrescriptionModule } from './medicalprescription/medical.prescri
     MedicineModule,
     UserModule,
     MedicalPrescriptionModule,
+    HolidayModule,
 ],
   controllers: [AppController],
   providers: [AppService],
