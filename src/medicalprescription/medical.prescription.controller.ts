@@ -15,6 +15,7 @@ import { MedicalPrescriptionService } from './medical.prescription.service';
 import { PageResponseDto } from '../shared/dto/page.response.dto';
 import { AccessTokenGuard } from '../shared/guards/access.token.guard';
 import MedicalPrescriptionDto from './dto/medical.prescription.dto';
+import UpdatePrescriptionTypeDto from './dto/update.prescription.type.dto';
 import { MedicalPrescriptionFiltersDto } from './dto/medical.prescription.filters.dto';
 import EmitMedicalPrescriptionFiltersDto from './dto/emit.medical.prescriptions.filters.dto';
 import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.dto';
@@ -53,6 +54,19 @@ export class MedicalPrescriptionController {
   ) {
     return this.medicalPrescriptionService.update(
       updateMedicalPrescriptionDto,
+    );
+  }
+
+  @Patch('type')
+  @ApiResponse({
+    status: 200,
+    description: 'Atualiza o tipo da prescrição médica (1=padrão, 2=azul, 3=amarela)',
+  })
+  updateType(
+    @Body() updatePrescriptionTypeDto: UpdatePrescriptionTypeDto,
+  ) {
+    return this.medicalPrescriptionService.updateType(
+      updatePrescriptionTypeDto,
     );
   }
 

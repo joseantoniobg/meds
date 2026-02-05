@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
+import { IsArray, IsIn, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
 export class Medicines {
   @IsUUID('4', { message: 'O id do medicamento deve ser um UUID' })
@@ -27,8 +27,9 @@ export default class MedicalPrescriptionDto {
   @IsNumber({}, { message: 'A quant. de dias para renovação deve ser numérica' })
   renewal: number;
 
-  @IsBoolean({ message: 'Se a receita é Azul deve ser um booleano' })
-  blue: boolean;
+  @IsNumber({}, { message: 'O tipo da receita deve ser numérico' })
+  @IsIn([1, 2, 3], { message: 'O tipo da receita deve ser 1 (padrão), 2 (azul) ou 3 (amarela)' })
+  prescriptionType: number;
 
   @IsArray({ message: 'A lista de medicamentos deve ser um array' })
   medicines: Medicines[];

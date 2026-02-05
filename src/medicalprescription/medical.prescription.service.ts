@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import MedicalPrescriptionDto from './dto/medical.prescription.dto';
+import UpdatePrescriptionTypeDto from './dto/update.prescription.type.dto';
 import { MedicalPrescriptionEntity } from './entities/medical.prescription.entity';
 import { MedicalPrescriptionMedicineEntity } from './entities/medical.prescription.medicine.entity';
 import { MedicalPrescriptionFiltersDto } from './dto/medical.prescription.filters.dto';
@@ -20,11 +21,11 @@ import { PdfService } from '../shared/service/pdf.service';
 @Injectable()
 export class MedicalPrescriptionService {
   constructor(@InjectRepository(MedicalPrescriptionEntity) private readonly medicalPrescriptionRepository: Repository<MedicalPrescriptionEntity>,
-              @InjectRepository(MedicalPrescriptionMedicineEntity) private readonly medicalPrescriptionMedicineRepository: Repository<MedicalPrescriptionMedicineEntity>,
-              @InjectRepository(MedicalPrescriptionEmissionEntity) private readonly medicalPrescriptionEmissionRepository: Repository<MedicalPrescriptionEmissionEntity>,
-              @InjectRepository(MedicalPrescriptionEmissionBatchEntity) private readonly medicalPrescriptionEmissionBatchRepository: Repository<MedicalPrescriptionEmissionBatchEntity>,
-              private readonly userService: UserService,
-            private readonly pdfService: PdfService) {}
+    @InjectRepository(MedicalPrescriptionMedicineEntity) private readonly medicalPrescriptionMedicineRepository: Repository<MedicalPrescriptionMedicineEntity>,
+    @InjectRepository(MedicalPrescriptionEmissionEntity) private readonly medicalPrescriptionEmissionRepository: Repository<MedicalPrescriptionEmissionEntity>,
+    @InjectRepository(MedicalPrescriptionEmissionBatchEntity) private readonly medicalPrescriptionEmissionBatchRepository: Repository<MedicalPrescriptionEmissionBatchEntity>,
+    private readonly userService: UserService,
+    private readonly pdfService: PdfService) { }
 
   async create(medicalPrescriptionDto: MedicalPrescriptionDto, token: TokenPayloadDto): Promise<MedicalPrescriptionEntity> {
     const user = await this.userService.getById(token.id);
@@ -33,56 +34,71 @@ export class MedicalPrescriptionService {
       throw new HttpException('Usuário não encontrado', 400);
     }
 
-   const medicalPrescription = this.medicalPrescriptionRepository.create({
+    const medicalPrescription = this.medicalPrescriptionRepository.create({
       patientId: medicalPrescriptionDto.patientId,
       initialDate: medicalPrescriptionDto.initialDate,
       renewal: medicalPrescriptionDto.renewal,
       userId: user.id,
-      typeId: medicalPrescriptionDto.blue ? 2 : 1,
-   });
+      typeId: medicalPrescriptionDto.prescriptionType,
+    });
 
-   const medicalPrescriptionSaved = await this.medicalPrescriptionRepository.save(medicalPrescription);
-   const medicines = medicalPrescriptionDto.medicines.map(medicine => {
+    const medicalPrescriptionSaved = await this.medicalPrescriptionRepository.save(medicalPrescription);
+    const medicines = medicalPrescriptionDto.medicines.map(medicine => {
       return {
         idMedicalPrescription: medicalPrescriptionSaved.id,
         idMedicine: medicine.id,
         instructionOfUse: formatString(medicine.instructionOfUse),
         quantity: formatString(medicine.quantity),
       }
-   }
-   );
-   await this.medicalPrescriptionMedicineRepository.save(medicines);
+    }
+    );
+    await this.medicalPrescriptionMedicineRepository.save(medicines);
 
-   medicalPrescriptionSaved.medicines = medicines as any;
+    medicalPrescriptionSaved.medicines = medicines as any;
 
-   return medicalPrescriptionSaved;
+    return medicalPrescriptionSaved;
   }
 
   async update(medicalPrescriptionDto: MedicalPrescriptionDto) {
-   return await this.medicalPrescriptionRepository.update(medicalPrescriptionDto.id, {
+    return await this.medicalPrescriptionRepository.update(medicalPrescriptionDto.id, {
       initialDate: medicalPrescriptionDto.initialDate,
       renewal: medicalPrescriptionDto.renewal,
-   });
+      typeId: medicalPrescriptionDto.prescriptionType,
+    });
+  }
+
+  async updateType(updatePrescriptionTypeDto: UpdatePrescriptionTypeDto) {
+    const medicalPrescription = await this.medicalPrescriptionRepository.findOne({
+      where: { id: updatePrescriptionTypeDto.id }
+    });
+
+    if (!medicalPrescription) {
+      throw new HttpException('Receita médica não encontrada', 404);
+    }
+
+    return await this.medicalPrescriptionRepository.update(updatePrescriptionTypeDto.id, {
+      typeId: updatePrescriptionTypeDto.prescriptionType,
+    });
   }
 
   async findMedicalPrescriptions(medicalPrescriptionFilters: MedicalPrescriptionFiltersDto): Promise<PageResponseDto<MedicalPrescriptionEntity>> {
     let medicalPrescriptions: PageResponseDto<MedicalPrescriptionEmissionDto>;
 
     if (medicalPrescriptionFilters.dailyEmission) {
-        medicalPrescriptions = await this.emitMedicalPrescriptions({
-          dailyEmission: true,
-          page: medicalPrescriptionFilters.page,
-          size: medicalPrescriptionFilters.size,
-          patientId: null,
-          medicalPrescriptionIds: null,
-          date: medicalPrescriptionFilters.date ?? new Date(),
-        });
+      medicalPrescriptions = await this.emitMedicalPrescriptions({
+        dailyEmission: true,
+        page: medicalPrescriptionFilters.page,
+        size: medicalPrescriptionFilters.size,
+        patientId: null,
+        medicalPrescriptionIds: null,
+        date: medicalPrescriptionFilters.date ?? new Date(),
+      });
     }
 
     const fetchedMedicines = await this.medicalPrescriptionRepository.findAndCount({
       skip: (medicalPrescriptionFilters.page - 1) * medicalPrescriptionFilters.size,
       take: medicalPrescriptionFilters.size,
-      where: { patientId: medicalPrescriptionFilters.patientId, id: medicalPrescriptions ? In(medicalPrescriptions.content.map (i => i.id)) : null },
+      where: { patientId: medicalPrescriptionFilters.patientId, id: medicalPrescriptions ? In(medicalPrescriptions.content.map(i => i.id)) : null },
       order: { createdAt: 'ASC' },
       relations: ['medicines', 'medicines.medicine', 'patient'],
       select: {
@@ -130,9 +146,15 @@ export class MedicalPrescriptionService {
     let sql = `SELECT COUNT(1) OVER () as total,
          t.id,
          CONCAT('<div class="md">',
-                 CASE WHEN t.id_type = 2 THEN '<div class="md-blue">
+                 CASE
+                   WHEN t.id_type = 2 THEN '<div class="md-blue">
                                               RECEITA AZUL
-                                            </div>' ELSE '' END,
+                                            </div>'
+                   WHEN t.id_type = 3 THEN '<div class="md-yellow">
+                                              RECEITA AMARELA
+                                            </div>'
+                   ELSE ''
+                 END,
 	              '<div class="md-header">
 	                <div>
 	                  <img class="logo" src="https://drive.google.com/thumbnail?id=19oJmJs10uHJSn5RocF3sUt5ttmCJj3gm" alt="sus-Logo">
@@ -419,20 +441,32 @@ export class MedicalPrescriptionService {
                 transform: rotate(-60deg) translate(-35%, ${isStandardLayout ? '20' : '40'}%);
                 color: rgba(0, 0, 0, 0.1);
               }
+
+              .md-yellow {
+                width: 800px;
+                font-family: Arial, Helvetica, sans-serif;
+                font-weight: 800;
+                line-height: 1;
+                position: absolute;
+                font-size: ${isStandardLayout ? '110' : '170'}px;
+                text-align: center;
+                transform: rotate(-60deg) translate(-35%, ${isStandardLayout ? '20' : '40'}%);
+                color: rgba(204, 153, 0, 0.15);
+              }
             </style>
             <body>
                 ${medicalPrescriptions.totalRecords == 0 ? '<h1>Não há receitas a serem impressas!</h1>' : medicalPrescriptions.content.map((mp) => mp.html).join('')}
             </body>
           </html>`;
 
-     const pdfBuffer = await this.pdfService.generatePdfFromHtml(html, emissionFilters.layout === 'standard');
+    const pdfBuffer = await this.pdfService.generatePdfFromHtml(html, emissionFilters.layout === 'standard');
 
-      response.set({
-        'Content-Type': 'application/pdf',
-        'Content-Length': pdfBuffer.length,
-        'Content-Disposition': 'attachment; filename=generated.pdf',
-      });
+    response.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'Content-Disposition': 'attachment; filename=generated.pdf',
+    });
 
-      response.send(pdfBuffer);
+    response.send(pdfBuffer);
   }
 }
