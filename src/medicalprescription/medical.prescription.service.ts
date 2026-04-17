@@ -140,12 +140,9 @@ export class MedicalPrescriptionService {
     const filters = Array();
 
     filters.push(emissionFilters.date ?? new Date());
+    filters.push(readOnly);
 
     const queryRunner = this.medicalPrescriptionEmissionRepository.manager.connection.createQueryRunner();
-
-    const signatureSql = readOnly
-      ? `'<p class="signature"><br></p>'`
-      : `'<p class="signature">', t.username, '<br>', t.crm, '</p>'`;
 
     let sql = `SELECT COUNT(1) OVER () as total,
          t.id,
@@ -190,7 +187,7 @@ export class MedicalPrescriptionService {
              <div class="md-center">
               <div class="md-footer">
                 <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
-                ${signatureSql}
+                ', CASE WHEN $2::BOOLEAN THEN '<p class="signature"><br></p>' ELSE CONCAT('<p class="signature">', t.username, '<br>', t.crm, '</p>') END, '
               </div>
             </div>
 			  </div>') as html
