@@ -113,10 +113,12 @@ export class MedicalPrescriptionController {
   async printPrescriptions(
     @Query() filters: EmitMedicalPrescriptionFiltersDto,
     @Res() res: Response,
+    @TokenPayload() token: TokenPayloadDto,
   ) {
     return this.medicalPrescriptionService.printMedicalPrescriptions(
       filters,
       res,
+      token,
     );
   }
 }

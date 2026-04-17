@@ -132,7 +132,7 @@ export class MedicalPrescriptionService {
     }
   }
 
-  async emitMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto): Promise<PageResponseDto<MedicalPrescriptionEmissionDto>> {
+  async emitMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, readOnly: boolean = false): Promise<PageResponseDto<MedicalPrescriptionEmissionDto>> {
     if (emissionFilters.medicalPrescriptionIds && emissionFilters.medicalPrescriptionIds.filter((id) => !isUUID(id, '4')).length > 0) {
       throw new HttpException('Id de receita médica deve ser um uuid', 400);
     }
@@ -142,6 +142,10 @@ export class MedicalPrescriptionService {
     filters.push(emissionFilters.date ?? new Date());
 
     const queryRunner = this.medicalPrescriptionEmissionRepository.manager.connection.createQueryRunner();
+
+    const signatureSql = readOnly
+      ? `'<p class="signature"><br></p>'`
+      : `'<p class="signature">', t.username, '<br>', t.crm, '</p>'`;
 
     let sql = `SELECT COUNT(1) OVER () as total,
          t.id,
@@ -186,7 +190,7 @@ export class MedicalPrescriptionService {
              <div class="md-center">
               <div class="md-footer">
                 <p>', TO_CHAR($1::DATE, 'DD/MM/YYYY'), '</p>
-                <p class="signature">', t.username, '<br>', t.crm, '</p>
+                ${signatureSql}
               </div>
             </div>
 			  </div>') as html
@@ -262,8 +266,8 @@ export class MedicalPrescriptionService {
     await this.medicalPrescriptionRepository.save(medicalPrescription);
   }
 
-  async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response) {
-    const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters);
+  async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response, token: TokenPayloadDto) {
+    const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters, token.readOnly);
 
     const batch = await this.medicalPrescriptionEmissionBatchRepository.save({
       isDailyEmission: emissionFilters.dailyEmission,
