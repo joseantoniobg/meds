@@ -263,6 +263,28 @@ export class MedicalPrescriptionService {
     await this.medicalPrescriptionRepository.save(medicalPrescription);
   }
 
+  async reactivateMedicalPrescription(id: string) {
+    if (!isUUID(id, '4')) {
+      throw new HttpException('Id de receita médica deve ser um uuid', 400);
+    }
+
+    const medicalPrescription = await this.medicalPrescriptionRepository.findOne({ where: { id } });
+    if (!medicalPrescription) {
+      throw new HttpException('Receita médica não encontrada', 404);
+    }
+    if (medicalPrescription.statusId === 1) {
+      throw new HttpException('Receita médica já está ativa', 400);
+    }
+
+    medicalPrescription.statusId = 1;
+    await this.medicalPrescriptionRepository.save(medicalPrescription);
+
+    const queryRunner = this.medicalPrescriptionRepository.manager.connection.createQueryRunner();
+    await queryRunner.query(`UPDATE "medical_prescription"
+                            SET renewal_date = case when renewal > 0 then next_working_day((coalesce(last_printed, initial_date) + renewal * interval '1 day')::DATE) else null end
+                            WHERE id = '${id}'`);
+  }
+
   async printMedicalPrescriptions(emissionFilters: EmitMedicalPrescriptionFiltersDto, response: Response, token: TokenPayloadDto) {
     const medicalPrescriptions = await this.emitMedicalPrescriptions(emissionFilters, token.readOnly);
 

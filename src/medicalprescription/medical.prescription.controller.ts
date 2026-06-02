@@ -84,6 +84,19 @@ export class MedicalPrescriptionController {
     );
   }
 
+  @Patch('reactivate')
+  @ApiResponse({
+    status: 200,
+    description: 'Reativa a prescrição médica cancelada e recalcula a data de renovação',
+  })
+  reactivatePrescription(
+    @Body('id') medicalPrescriptionId: string,
+  ) {
+    return this.medicalPrescriptionService.reactivateMedicalPrescription(
+      medicalPrescriptionId,
+    );
+  }
+
   @Get()
   @ApiResponse({
     status: 200,
