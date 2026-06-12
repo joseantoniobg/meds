@@ -11,6 +11,7 @@ import { MedicineModule } from './medicine/medicine.module';
 import { MedicalPrescriptionEntity } from './medicalprescription/entities/medical.prescription.entity';
 import { MedicalPrescriptionModule } from './medicalprescription/medical.prescription.module';
 import { HolidayModule } from './holiday/holiday.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [ ConfigModule.forRoot({
@@ -23,6 +24,7 @@ import { HolidayModule } from './holiday/holiday.module';
     UserModule,
     MedicalPrescriptionModule,
     HolidayModule,
+    SettingsModule,
 ],
   controllers: [AppController],
   providers: [AppService],

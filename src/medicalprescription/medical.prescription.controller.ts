@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Res,
+  HttpException,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MedicalPrescriptionService } from './medical.prescription.service';
@@ -22,6 +23,7 @@ import MedicalPrescriptionEmissionDto from './dto/medical.prescription.emission.
 import { Response, Request } from 'express';
 import { TokenPayload } from '../shared/decorators/token.decorator';
 import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
+import { SettingsService } from '../settings/settings.service';
 
 @ApiTags('Medical Prescriptions')
 @Controller('medicalPrescriptions')
@@ -29,6 +31,7 @@ import { TokenPayloadDto } from '../shared/dto/token.payload.dto';
 export class MedicalPrescriptionController {
   constructor(
     private readonly medicalPrescriptionService: MedicalPrescriptionService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   @Post()
@@ -128,6 +131,12 @@ export class MedicalPrescriptionController {
     @Res() res: Response,
     @TokenPayload() token: TokenPayloadDto,
   ) {
+    const settings = await this.settingsService.getSettings();
+
+    if (token.readOnly && settings.restrictReadOnlyPrint) {
+      throw new HttpException('Impressão desabilitada para usuários somente leitura', 403);
+    }
+
     return this.medicalPrescriptionService.printMedicalPrescriptions(
       filters,
       res,

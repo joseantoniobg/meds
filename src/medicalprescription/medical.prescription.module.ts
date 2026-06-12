@@ -13,6 +13,7 @@ import { UserModule } from '../user/user.module';
 import { MedicalPrescriptionStatusEntity } from './entities/medical.prescription.status.entity';
 import { MedicalPrescriptionTypeEntity } from './entities/medical.prescription.type.entity';
 import { PdfModule } from '../shared/service/pdf.module';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PatientEntity, MedicineEntity,
@@ -23,7 +24,8 @@ import { PdfModule } from '../shared/service/pdf.module';
                                       MedicalPrescriptionStatusEntity,
                                       MedicalPrescriptionTypeEntity,]),
             UserModule,
-            PdfModule],
+            PdfModule,
+            SettingsModule],
   controllers: [MedicalPrescriptionController],
   providers: [MedicalPrescriptionService],
 })
